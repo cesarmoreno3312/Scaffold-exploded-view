@@ -1,50 +1,53 @@
-# Registro de reglas de parametrización — MVP 0.1.1
+# Matriz de reglas comerciales — MVP 0.2.0
 
-**Objeto:** despieces comerciales preliminares de una bahía central Ring Lock y extensiones adyacentes en L. Fuente del catálogo: `PIEZAS CONSTRUYEQUIPOS.xlsx` (67 referencias). **No es una validación estructural.**
+**No constituye ingeniería estructural ni autorización de montaje.** Las reglas son comerciales preliminares y las excepciones específicas tienen prioridad.
 
-| ID | Regla / criterio | Estado de parametrización |
-|---|---|---|
-| GEO-01 | `H` es altura de plataforma de trabajo; protección superior a `H + 1 m`. | Implementada |
-| GEO-02 | Módulos comerciales base 0.75, 1.40, 2.072, 3.00 m. | Implementada |
-| GEO-03 | Extensiones hasta dos lados adyacentes +X y +Y; nodos compartidos únicos. | Implementada |
-| GEO-04 | `H/4,3` como dimensión mínima geométrica comercial por eje (redondeo hacia arriba al milímetro); si la base central cumple, las extensiones son cero. | Implementada, **no es evaluación de estabilidad** |
-| GEO-05 | Altura tentativa de extensión por fórmula `H - 4×dimensión eje`, al múltiplo par de 2 más próximo, mínimo 2 m. | **Provisional, editable** |
-| EST-01 | Horizontales estructurales pares: `0,2,4,…,H`. | Implementada |
-| EST-02 | Dos barandas por nivel de acceso a `+0.50` y `+1.00 m`, alrededor del perímetro central. | Implementada como hipótesis de protección |
-| EST-03 | No contar horizontales iguales en mismos extremos y elevación. | Implementada por deduplicación geométrica |
-| EST-04 | Una diagonal por cara y tramo de 2 m, torre central completa. | Implementada |
-| EST-05 | Extensiones diagonales en tres caras expuestas; no duplicar la cara compartida. | Implementada |
-| EST-06 | Dos diagonalados de unión adicionales por extensión. | **Pendiente SKU real y detalle constructivo** |
-| EST-07 | Una Base Collar por apoyo único; pin por empalme vertical real. | Implementada |
-| EST-08 | Verticales centrales de 2 m, 1 m terminal para baranda; nuevas líneas de extensión. | Implementada; selección con/sin espigo **provisional** |
-| ACC-01 | Torres 1.40×1.40: escotilla cada 2 m, dos plataformas metálicas de 1.40 junto a cada escotilla, una de arranque. | Implementada |
-| ACC-02 | Torres 1.40×1.40: no agregar horizontales interiores de 0.75 m para escotillas. | Implementada |
-| ACC-03 | Torres no 1.40×1.40: cierres intermedios con 2 verticales 1 m, 4 horizontales 0.75, 4 de longitud de escotilla. | Implementada por conjuntos; ubicación física **pendiente** |
-| ACC-04 | H par: escaleras y escotillas a 2,4,…,H. | Implementada |
-| ACC-05 | H impar: plataformas iniciales a 0,0.50,1 m, **sin escotilla a 1 m**, escotillas desde 3 m cada 2 m. | **Pendiente siguiente versión** |
-| ACC-06 | Torre 0.75×1.40 H≥4: acceso tipo gato, sin diagonales en cara de acceso. | **Pendiente siguiente versión** |
-| PLA-01 | Nivel superior completo: para 1.40×1.40 dos plataformas junto a escotilla; 2.072×2.072 cuatro; 3×3 siete. | Implementada |
-| PLA-02 | Rodapiés perimetrales solamente en plataforma de trabajo superior del MVP. | Implementada |
-| BAS-01 | H≤12 m: ambas alternativas de base en tabla, excluyentes en montaje. | Implementada |
-| BAS-02 | H>12 m: solo tornillo nivelador plano. | **Pendiente versión con alturas altas** |
-| CAT-01 | Resolver cada pieza por código exacto del inventario. | Implementada; 67 códigos |
-| QA-01 | Total SKU por suma de filas; prueba de integridad de cada origen. | Implementada |
+| ID | Regla | Estado |
+| --- | --- | --- |
+| GEO-01 | H es la altura de plataforma de trabajo. Remate superior H+1 m. | Implementada |
+| GEO-02 | H entero de 2 a 50 m. | Implementada |
+| GEO-03 | Una bahía central permitida; longitudes 1400, 2072 y 3000 mm. | Implementada |
+| GEO-04 | Dimensionamiento geométrico mínimo `H/4,3` por cada eje, redondeo arriba al milímetro. **No es prueba de estabilidad.** | Implementada |
+| GEO-05 | Mínimo número de extensiones comerciales 750,1400,2072 y 3000 mm; varios módulos encadenados si la longitud exige. | Implementada en +X y +Y |
+| GEO-06 | Base envolvente puede quedar en L; su área no es un polígono de estabilización certificado. | Advertencia explícita |
+| GEO-07 | Altura de cada módulo escalonada aproximadamente `H−4×(ancho central + módulos internos)`, con paridad de H. | **Provisional** |
+| EST-01 | H par: horizontales estructurales a 0,2,…H. | Implementada |
+| EST-02 | H impar: horizontales estructurales a 0,1,3,…H. | Implementada |
+| EST-03 | Dos alturas de baranda (+0,50 y +1 m) en cada nivel de acceso de la torre central. | Hipótesis comercial |
+| EST-04 | Deducción de horizontales físicas repetidas por coordenadas, SKU y elevación. | Implementada |
+| EST-05 | Diagonal en cada cara central por cada tramo de 2 m; en extensiones, en caras expuestas. | Implementada por tramos completos |
+| EST-06 | Diagonal de 1 m en tramo incompleto de extensión. | **No calculada** |
+| EST-07 | Dos diagonalados de unión por extensión. | Pendiente SKU / detalle / conexión |
+| EST-08 | Base Collar uno por nodo de apoyo; un pin por empalme real. | Implementada en módulos representados |
+| EST-09 | Verticales centrales de 2 m, remate de 1 m y tramo inferior de 1 m cuando H es impar. | Implementada; validar espigos |
+| ACC-01 | H par: escotillas y escaleras a 2,4,…H. | Implementada |
+| ACC-02 | H impar: tres plataformas de arranque (0,0,50,1 m); primera escotilla a 3 m y siguientes cada 2 m. | Implementada parcialmente; soportes pendientes |
+| ACC-03 | H impar: no instalar escotilla a 1 m. | Implementada |
+| ACC-04 | 1400×1400 mm: dos plataformas de 320×1400 por escotilla, incluida intermedia. | Implementada |
+| ACC-05 | 1400×1400 mm: cierre perimetral completo; cero horizontales 750 mm de cierre interior. | Implementada |
+| ACC-06 | Otras medidas: cierres de escotilla con 2×vertical de 1m, 4×horizontal 750 y 4×horizontal de longitud de escotilla. | Cantidad provisional; geometría física pendiente |
+| ACC-07 | 750×1400, H≥4, acceso tipo gato. | **Fuera de alcance** |
+| PLA-01 | Cubierta superior según central: 2 para 1400×1400, 4 para 2072×2072, 7 para 3000×3000 más escotilla. | Implementada |
+| BAS-01 | H ≤12: tornillos planos y ruedas alternativamente, ambos en tabla comercial. | Implementada |
+| BAS-02 | H >12: solo tornillos niveladores planos. | Implementada |
+| QA-01 | Total por SKU exacto, suma de orígenes, unicidad de referencias. | Implementada |
+| QA-02 | Pruebas de regresión 6,8,10,17,49,50 m y combinatoria 5 bases×49 alturas. | Implementada |
 
-## Criterios de bloqueo de salida técnica
+## Riesgos y límites pendientes de validación
 
-1. Si el diámetro, longitud, uso o referencia de una pieza no está confirmado, se registra como **pendiente fuera del total SKU**.
-2. Si una base no cumple `H/4,3` en cualquier eje, la selección de la aplicación se rechaza; ello **no garantiza que una base que sí lo cumpla sea estable**.
-3. El usuario debe ver siempre la leyenda **NO APTO COMO PLAN DE MONTAJE**.
-4. Una extensión en L requiere revisión de estabilidad en todos los sentidos, especialmente hacia los costados no extendidos.
-5. Antes de habilitar exportaciones de montaje o emitir certificados se necesitarán verificación estructural y aprobación de ingeniería.
+- Los 4,3:1 se aplican **solo como filtro geométrico comercial**. La estabilidad debe calcularse conforme a condiciones reales y normativa aplicable.
+- En especial a 50 m, la planta representada con prolongaciones en L puede resultar totalmente inadecuada para estabilidad: no se debe interpretar como un diseño aprobado.
+- Los módulos encadenados representan un **esquema geométrico**, no un detalle estructural completo de conexiones y estabilizadores.
+- La suma de SKU excluye diagonalados sin referencia real, anclajes y fijaciones de accesos en alturas impares.
+- Los rodapiés y niveles de protección se calculan con el criterio comercial preliminar; requiere conciliación con manual del sistema.
+- Ampliar alturas no supone incorporar soportes a pared, varias bahías centrales, ni cargas admisibles.
 
-## Casos de regresión
+## Casos mínimos automatizados
 
-- **6 m, 1.40×1.40:** `6/1,40 = 4,286 ≤ 4,3`; sin extensiones en ambos ejes, 4 apoyos, 3 escotillas, 3 escaleras, 7 plataformas metálicas y 0 diagonalados de unión pendientes.
-- **8 m, 1.40×1.40:** `8/1,40 = 5,714 > 4,3`; sigue requiriendo extensiones.
-
-- 8 m, 1.40×1.40, dos extensiones de 0.75 m de 2 m; 4 escotillas, 9 plataformas y 0 cierres interiores; 56 horizontales 1.40, 8 horizontales 0.75; 18 diagonales 1.40, 4 diagonales 0.75.
-- 10 m, 2.072×1.40, extensiones 0.75 m/H2 y 1.40 m/H4; 5 escotillas, 3 plataformas; 51 horizontales 2.072, 40 horizontales 1.40, 20 horizontales 0.75; 12 diagonales 2.072, 15 diagonales 1.40, 2 diagonales 0.75.
-- 10 m, 3×3 sin extensiones; 8 plataformas metálicas (1 arranque +7 piso superior); 4 puntos de apoyo.
-
-**Atención:** las cifras de regresión verifican la lógica comercial acordada, no cargas ni resistencia física.
+- 6 m / 1400×1400: sin extensiones, 4 apoyos, 3 escotillas, 7 plataformas metálicas.
+- 8 m / 1400×1400: extensiones 750 mm H2 por eje, 8 apoyos, acceso caracol.
+- 10 m / 2072×1400: extensiones 750 mm H2 y 1400 mm H4.
+- 17 m / 3000×3000: 8 escotillas desde 3 m, alturas de extensión 5 m, tornillo plano únicamente.
+- 49 m / 3000×3000: alturas impares, 24 escotillas, arranque escalonado pendiente de apoyos.
+- 50 m / 3000×3000: tres módulos de 3000 mm encadenados por eje (+X y +Y), alturas comerciales estimadas 38,26,14 m; 16 apoyos planos y 25 escotillas; **no es un plan de montaje**.
+- 50 m / 1400×1400: cuatro módulos por eje, sin interiores de 750 mm de escotilla.
