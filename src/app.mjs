@@ -12,40 +12,50 @@ const configuration=()=>({
 function toast(text){const e=$('toast');e.textContent=text;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2300);}
 function statLine(label,value,accent=false){return `<div class="geo-row"><span>${escapeHtml(label)}</span><strong class="${accent?'accent':''}">${escapeHtml(value)}</strong></div>`;}
 function renderDiagram(geo){
- const {main,extensionX,extensionY}=geo;
- const polygons=[{points:main,color:'#bde4da',stroke:'#168a7e'},...(extensionX?[{points:extensionX,color:'#dfe8ea',stroke:'#668a92'}]:[]),...(extensionY?[{points:extensionY,color:'#dfe8ea',stroke:'#668a92'}]:[])];
+ const {main}=geo;
+ const extensions=[...(geo.extensionsX||[]).map(m=>({...m,axis:'X'})),...(geo.extensionsY||[]).map(m=>({...m,axis:'Y'}))];
+ const polygons=[{points:main,color:'#bde4da',stroke:'#168a7e'},
+  ...extensions.map((m,i)=>({points:m.polygon,color:i%2?'#d3e5e8':'#dfe8ea',stroke:'#668a92'}))];
  const maxX=geo.envelopeX,maxY=geo.envelopeY;
- const factor=Math.min(300/maxX,212/maxY);
+ const factor=Math.min(350/maxX,225/maxY);
  const offX=(420-maxX*factor)/2,offY=(260-maxY*factor)/2;
  const pt=([x,y])=>[offX+x*factor, 260-offY-y*factor];
  const grid=[...Array(13)].map((_,i)=>`<line x1="${20+i*31.4}" y1="9" x2="${20+i*31.4}" y2="268" stroke="#f1f5f4"/>`).join('')+
    [...Array(9)].map((_,i)=>`<line y1="${13+i*31}" x1="17" y2="${13+i*31}" x2="400" stroke="#f1f5f4"/>`).join('');
  const fills=polygons.map(p=>`<polygon points="${p.points.map(a=>pt(a).join(',')).join(' ')}" fill="${p.color}" fill-opacity="0.82" stroke="${p.stroke}" stroke-width="2.6" stroke-linejoin="round"/>`).join('');
  const supports=new Set(polygons.flatMap(p=>p.points.map(a=>a.join(','))));
- const circles=[...supports].map(s=>{const [x,y]=pt(s.split(',').map(Number));return `<circle cx="${x}" cy="${y}" r="5.5" fill="#fff" stroke="#11786e" stroke-width="2.8"/>`;}).join('');
+ const circles=[...supports].map(v=>{const [x,y]=pt(v.split(',').map(Number));return `<circle cx="${x}" cy="${y}" r="5.5" fill="#fff" stroke="#11786e" stroke-width="2.8"/>`;}).join('');
  const center=pt([geo.main[1][0]/2,geo.main[2][1]/2]);
  const label=`<text x="${center[0]}" y="${center[1]-6}" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#146f67" font-weight="800">TORRE CENTRAL</text><text x="${center[0]}" y="${center[1]+10}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#487d7a">${formatDimension(geo.main[1][0])} × ${formatDimension(geo.main[2][1])}</text>`;
- const extTags=[extensionX && {p:pt([(extensionX[0][0]+extensionX[1][0])/2,(extensionX[0][1]+extensionX[2][1])/2]),text:'+X'},extensionY && {p:pt([(extensionY[0][0]+extensionY[2][0])/2,(extensionY[0][1]+extensionY[2][1])/2]),text:'+Y'}].filter(Boolean).map(t=>`<text x="${t.p[0]}" y="${t.p[1]}" text-anchor="middle" font-weight="800" font-size="12" fill="#496a70">${t.text}</text>`).join('');
+ const extTags=extensions.map(m=>{const mid=[m.polygon.reduce((a,p)=>a+p[0],0)/4,m.polygon.reduce((a,p)=>a+p[1],0)/4];return {p:pt(mid),text:`+${m.axis}${m.index}`};})
+  .map(t=>`<text x="${t.p[0]}" y="${t.p[1]}" text-anchor="middle" font-weight="800" font-size="12" fill="#496a70">${t.text}</text>`).join('');
  $('footprint').innerHTML=`${grid}${fills}${circles}${label}${extTags}`;
 }
+const describeModules=modules=>modules.length?
+  `${modules.length} módulo(s): ${modules.map(m=>`${formatDimension(m.length)} m / H ${m.height} m`).join(' + ')}`:'No requerida';
+
 function render(r){
  lastResult=r;
  $('metric-total').textContent=number(r.totals.listed);
  $('metric-onebase').textContent=number(r.totals.oneBaseOption);
  $('metric-supports').textContent=number(r.totals.baseNodes);
- $('metric-pending').textContent=number(r.totals.unmapped);
+ $('metric-pending').textContent=number(r.totals.pendingConcepts ?? r.pending.length);
  $('footer-total').textContent=`Total: ${number(r.totals.listed)} piezas`;
  $('access-mode').textContent=r.access.mode==='caracol'?'Tipo caracol':'Escaleras y escotillas';
+ $('base-options').textContent=r.input.height<=12?'Planos + ruedas *':'Solo tornillos planos';
+ $('base-footnote').textContent=r.input.height<=12?'* Ambas opciones de base se relacionan; en montaje se utiliza una sola.':'Para alturas superiores a 12 m solo se relacionan tornillos niveladores de base plana.';
+ $('onebase-label').textContent=r.input.height<=12?'Una opción de base':'Piezas con base plana';
  renderDiagram(r.geometry);
  const m= formatDimension;
  $('geometry-stats').innerHTML=[
    statLine('Base central',`${m(r.input.spanX)} × ${m(r.input.spanY)} m`),
    statLine('Huella exterior',`${m(r.geometry.envelopeX)} × ${m(r.geometry.envelopeY)} m`,true),
-   statLine('Extensión +X',r.input.extensionX?`${m(r.input.extensionX)} m · H ${r.input.extensionHeightX} m`:'No requerida'),
-   statLine('Extensión +Y',r.input.extensionY?`${m(r.input.extensionY)} m · H ${r.input.extensionHeightY} m`:'No requerida'),
+   statLine('Extensiones +X',describeModules(r.input.extensionModulesX)),
+   statLine('Extensiones +Y',describeModules(r.input.extensionModulesY)),
    statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
    statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras`),
+   statLine('Altura de trabajo',`${r.input.height} m${r.input.height>12?' · ingeniería obligatoria':''}`),
    statLine('Plataformas metálicas',`${r.access.metalPlatforms} unidades`),
  ].join('');
  $('pending-list').innerHTML=r.pending.length?r.pending.map(i=>`<div class="pending-item"><strong>⚠ ${escapeHtml(i.concepto)} — ${i.cantidad}</strong>${escapeHtml(i.motivo)}</div>`).join(''):'<div class="no-pending">No hay conceptos sin referencia comercial en este cálculo.</div>';
@@ -65,6 +75,8 @@ function recalc(){
    $('pending-list').innerHTML=`<div class="error-message">${escapeHtml(err.message)}</div>`;
    toast('Corrige los parámetros de entrada');
    lastResult=null;
+   for(const id of ['metric-total','metric-onebase','metric-supports','metric-pending']) $(id).textContent='—';
+   $('footer-total').textContent='No hay despiece válido';
  }
 }
 function save(name,contents,type){const blob=new Blob([contents],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('Archivo generado');}
@@ -73,14 +85,33 @@ function downloadCSV(){
  const csv='\ufeff' + [
   ['Código','Descripción','Cantidad relacionada','Desglose de origen'],
   ...lastResult.items.map(i=>[i.codigo,i.descripcion,i.cantidad,i.reasons.map(x=>`${x.reason}: ${x.quantity}`).join(' | ')]),
-  ['TOTAL','Incluye alternativas de ruedas y tornillos niveladores',lastResult.totals.listed,''],
-  ['MONTAJE CON UNA BASE','Alternativa de apoyo excluyente',lastResult.totals.oneBaseOption,''],
+  ['TOTAL','Piezas de inventario relacionadas',lastResult.totals.listed,''],
+  ['TOTAL UNA OPCIÓN','Una alternativa de apoyos (ruedas o planos si H≤12)',lastResult.totals.oneBaseOption,''],
+  ...lastResult.pending.map(p=>['PENDIENTE',p.concepto,p.cantidad,p.motivo]),
+  ['ADVERTENCIA','PRELIMINAR: NO ES PLAN DE MONTAJE', '',lastResult.warnings.join(' | ')],
  ].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
  save('despiece-ringlock.csv',csv,'text/csv;charset=utf-8');
 }
 function downloadJSON(){if(!lastResult)return;save('despiece-ringlock.json',JSON.stringify(lastResult,null,2),'application/json;charset=utf-8');}
+// Todos los metros enteros del alcance actual, incluyendo alturas impares.
+const heightSelect=$('height');
+heightSelect.innerHTML=Array.from({length:49},(_,i)=>{const h=i+2;return `<option value="${h}" ${h===10?'selected':''}>${h},00 m</option>`;}).join('');
+function updateHeightOptions(){
+ const H=Number(heightSelect.value);
+ for(const id of ['extensionHeightX','extensionHeightY']) {
+  const el=$(id),previous=el.value;
+  el.innerHTML='<option value="auto">Automática</option>'+
+   Array.from({length:H},(_,i)=>i+1).filter(v=>v>=(H%2?1:2) && v%2===H%2)
+    .map(v=>`<option value="${v}">${v} m</option>`).join('');
+  el.value=[...el.options].some(o=>o.value===previous)?previous:'auto';
+ }
+}
+updateHeightOptions();
 $('tower-form').addEventListener('submit',ev=>{ev.preventDefault();recalc();});
-$('tower-form').querySelectorAll('select').forEach(el=>el.addEventListener('change',recalc));
+$('tower-form').querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>{
+ if(el.id==='height')updateHeightOptions();
+ recalc();
+}));
 $('filter').addEventListener('input',renderTable);
 $('download-csv').addEventListener('click',downloadCSV);
 $('download-json').addEventListener('click',downloadJSON);
