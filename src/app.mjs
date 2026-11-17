@@ -9,8 +9,11 @@ const formatArea=m2=>new Intl.NumberFormat('es-CO',{minimumFractionDigits:2,maxi
 const options=[750,1400,2072,3000];
 const configuration=()=>({
   height:Number($('height').value),baysX:[...bayState.X],baysY:[...bayState.Y],
-  extensionX:$('extensionX').value, extensionY:$('extensionY').value,
-  extensionHeightX:$('extensionHeightX').value,extensionHeightY:$('extensionHeightY').value,
+  clientRequestedNoExtensions:$('client-no-extensions').checked,
+  extensionX:$('client-no-extensions').checked?'0':$('extensionX').value,
+  extensionY:$('client-no-extensions').checked?'0':$('extensionY').value,
+  extensionHeightX:$('client-no-extensions').checked?'auto':$('extensionHeightX').value,
+  extensionHeightY:$('client-no-extensions').checked?'auto':$('extensionHeightY').value,
 });
 function renderBayRows(axis){
   const rows=$(`bays${axis}Rows`);
@@ -80,7 +83,9 @@ function render(r){
  $('metric-onebase').textContent=number(r.totals.oneBaseOption);
  $('metric-supports').textContent=number(r.totals.baseNodes);
  $('metric-pending').textContent=number(r.totals.pendingConcepts ?? r.pending.length);
- $('footer-total').textContent=`Total: ${number(r.totals.listed)} piezas`;
+ $('footer-total').textContent=r.input.clientRequestedNoExtensions?
+   `Despiece preliminar: ${number(r.totals.listed)} piezas · anclajes no incluidos`:
+   `Total: ${number(r.totals.listed)} piezas`;
  $('access-mode').textContent=({caracol:'Tipo caracol',gato:'Tipo gato',estrecho:'Escaleras, escotillas y barandas',pendiente:'Pendiente de definir'})[r.access.mode] || 'Escaleras y escotillas';
  $('base-options').textContent=r.input.height<=12?'Planos + ruedas *':'Solo tornillos planos';
  $('base-footnote').textContent=r.input.height<=12?'* Ambas opciones de base se relacionan; en montaje se utiliza una sola.':'Para alturas superiores a 12 m solo se relacionan tornillos niveladores de base plana.';
@@ -94,6 +99,12 @@ function render(r){
    statLine('Extensiones +X',describeModules(r.input.extensionModulesX)),
    statLine('Extensiones +Y',describeModules(r.input.extensionModulesY)),
    statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
+   statLine('Modalidad',r.input.clientRequestedNoExtensions?
+     'Solicitud del cliente: SIN bases extensibles (anclajes por definir)':
+     'Configuración con extensiones según selección'),
+   statLine('Filtro geométrico H/4,3',r.geometry.meetsCommercialFootprint?
+     'Cumple filtro comercial; NO certifica estabilidad':
+     'NO CUMPLE · requiere diseño de estabilización externa'),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
    statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras${r.access.hatchCell?` · celda X${r.access.hatchCell.column}/Y${r.access.hatchCell.row}`:''}`),
    statLine('Barandas de perímetro',r.access.guardedLevels.length===1?`Solo piso de trabajo superior: ${r.input.height} m`:`${r.access.guardedLevels.length} niveles de acceso con barandas (revisión técnica)`),
@@ -154,6 +165,13 @@ function updateHeightOptions(){
  }
 }
 updateHeightOptions();
+function updateClientRequestMode(){
+ const selected=$('client-no-extensions').checked;
+ for(const id of ['extensionX','extensionY','extensionHeightX','extensionHeightY'])
+   $(id).disabled=selected;
+ recalc();
+}
+$('client-no-extensions').addEventListener('change',updateClientRequestMode);
 $('tower-form').addEventListener('submit',ev=>{ev.preventDefault();recalc();});
 $('tower-form').querySelectorAll('select:not([data-axis])').forEach(el=>el.addEventListener('change',()=>{
  if(el.id==='height')updateHeightOptions();
