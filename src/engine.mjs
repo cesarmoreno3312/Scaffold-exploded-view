@@ -211,7 +211,11 @@ export function calculate(config,catalog) {
   // NO hace falta marcar una segunda casilla para obtener el despiece.
   const explicitlyZero=value=>value===0||value==='0';
   const bothSelectorsWithoutExtensions=explicitlyZero(config.extensionX)&&explicitlyZero(config.extensionY);
-  const clientRequestedNoExtensions=config.clientRequestedNoExtensions===true||bothSelectorsWithoutExtensions;
+  // Un par de ceros que YA cumple H/base no necesita aviso de déficit;
+  // el aviso reforzado se reserva para una solicitud fuera del filtro.
+  const wouldFallOutsideFilter=x*43<H*10000||y*43<H*10000;
+  const clientRequestedNoExtensions=config.clientRequestedNoExtensions===true||
+    (bothSelectorsWithoutExtensions&&wouldFallOutsideFilter);
   if(config.clientRequestedNoExtensions===true)for(const axis of ['X','Y']) {
     const requested=config[`extension${axis}`];
     invariant(requested===undefined||requested===null||requested==='auto'||Number(requested)===0,
