@@ -89,3 +89,11 @@
 - Los totales comerciales incluyen únicamente elementos Ring Lock parametrizados para la torre central y los apoyos disponibles, **sin accesorios de estabilización externos**. El estado del cálculo debe señalar `ESTABILIDAD NO VERIFICADA` y `NO APTO COMO PLAN DE MONTAJE`.
 - La casilla de la interfaz exige una selección explícita, para que pedir una torre sin extensiones no se confunda con el dimensionamiento automático.
 - Se documentan pruebas para H10 de 1,40×1,40 (no cumple H/4,3, 4 apoyos), H12 de 0,75×3,00, H50 de 3×3 y H6 de 1,40×1,40.
+
+## GEO-09 — Selector «Sin extensión» sin bloqueo (v0.3.4)
+
+- `extensionX=0` o `extensionY=0` es una decisión explícita de configuración que **no impide calcular el inventario**, aun cuando H/(base exterior) supere 4,3.
+- Si ambos ejes son cero y la torre no supera el filtro comercial, el motor marca la modalidad de solicitud sin bases; si la torre cumple H/base, los selectores en cero se admiten normalmente sin una advertencia ficticia.
+- Si al menos un eje incumple H/4,3, el resultado es **ESTABILIDAD NO VERIFICADA** y se registra como pendiente ingeniería de estabilización externa, anclajes y amarres, fuera del BOM. La configuración se identifica visualmente antes de los indicadores.
+- `extensionX=auto` / `extensionY=auto` conservan la generación de extensiones. Los módulos manuales mayores que cero continúan sujetos al criterio, porque la validación de tamaños insuficientes no se ha eliminado.
+- Todos los materiales son estimación comercial preliminar y **nunca constituyen autorización de uso o montaje**.
