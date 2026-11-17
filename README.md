@@ -1,4 +1,4 @@
-# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.0
+# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.1
 
 Aplicación web estática y local para elaborar **despieces comerciales preliminares** de una torre central de bahías modulares y módulos de extensión adyacentes encadenados. Inventario real de 67 referencias del archivo `PIEZAS CONSTRUYEQUIPOS.xlsx`.
 
@@ -70,3 +70,8 @@ Los cambios en `main` disparan automáticamente las pruebas y la publicación me
 El área central se define agregando tramos de 0,75 / 1,40 / 2,072 / 3,00 m en el sentido X (largo) y Y (ancho). Por ejemplo, `X=[750,1400]` y `Y=[2072,3000]` produce una planta de **2,15 × 5,072 m**, cuatro paños, y nueve puntos de apoyo centrales compartidos. La aplicación cuenta horizontales y diagonales de cada módulo en lugar de inventar una pieza de largo total.
 
 Se dispone de las **16 parejas** básicas y hasta diez módulos por sentido. Si no hay una bahía con acceso comercial conocido (por ejemplo 0,75×0,75), se genera únicamente despiece parcial, con acceso pendiente y sin escotillas ficticias. Las plataformas de la cubierta múltiple son estimaciones comerciales por paño; **no autorizar montaje** con esos resultados sin validar compatibilidad y resistencia.
+## Revisión de barandas y horizontales (v0.3.1)
+
+Las escotillas intermedias no son plataformas completas de trabajo por defecto. Por eso las barandas perimetrales de 0,50 y 1,00 m se contabilizan en la plataforma de trabajo superior, mientras que los niveles de acceso intermedios no-caracol conservan sus cerramientos internos provisionales. Para acceso caracol de 1,40×1,40 se mantiene la protección de cada plataforma de tránsito.
+
+**Caso de regresión verificado: 10 m × planta 3×3 m, AMD.HZ.3000 = 24 horizontales de estructura + 8 barandas superiores + 16 cierres de escotillas = 48 (antes 80).** Ahora «Ver cálculo» agrupa los materiales por concepto con subtotales. Si se pretende utilizar pisos intermedios como áreas de trabajo, deben definirse protecciones, rodapiés y plataformas adicionales; no está automatizado en esta versión y no sustituye diseño ni autorización de montaje.

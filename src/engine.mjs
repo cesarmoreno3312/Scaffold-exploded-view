@@ -1,5 +1,5 @@
 /**
- * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3
+ * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.1
  * Geometría expresada en milímetros. NO equivale a diseño estructural,
  * certificado de autoestabilidad, plano de montaje ni listado completo de fijaciones.
  * Malla de bahías modulares y extensiones comerciales adyacentes (+X y +Y).
@@ -259,7 +259,8 @@ export function calculate(config,catalog) {
   if(H>26 || allExtensionModules.length>2) {
     warnings.push('Extensiones comerciales encadenadas en uno o ambos ejes: la geometría y sus conexiones deben definirse y aprobarse específicamente. Este despiece NO es completo para ejecución.');
   }
-  if(closures)warnings.push('Los cerramientos interiores se cuentan por componentes; ubicación y fijación físicas aún pendientes.');
+  if(closures)warnings.push('Los niveles intermedios se tratan como pasos con escotilla y cerramiento interior; no como pisos completos de trabajo. La protección real de cada acceso debe verificarse técnicamente.');
+  if(spiral&&cells.length>1)warnings.push('La protección de niveles intermedios caracol en plantas de varios paños es preliminar; validar perímetros reales de plataformas y barandas antes de utilizar el despiece.');
 
   function add(code,quantity,reason,details='') {
     invariant(Number.isInteger(quantity)&&quantity>=0,`Cantidad inválida: ${code}`);
@@ -286,8 +287,13 @@ export function calculate(config,catalog) {
   for(const z of mainLevels) for(const edge of mainEdges) horizontal(edge,z,'Horizontales de torre central');
   for(const m of allExtensionModules) for(const z of structuralLevels(m.height))
     for(const edge of m.edges)horizontal(edge,z,`Horizontales de extensión ${m.axis}${m.index}`);
-  for(const level of (accessResolved?accessLevels(H):[H])) for(const offset of [500,1000]) for(const edge of mainPerimeter)
-    horizontal(edge,level*1000+offset,'Barandas perimetrales de nivel accesible');
+  // Las escotillas intermedias no representan plataformas completas de trabajo.
+  // Solo el último piso recibe barandas de perímetro, salvo acceso caracol
+  // de 1,40×1,40, que tiene plataformas de paso en niveles intermedios.
+  const guardedLevels=spiral?accessLevels(H):[H];
+  for(const level of guardedLevels)for(const offset of [500,1000])for(const edge of mainPerimeter)
+    horizontal(edge,level*1000+offset,
+      level===H?'Barandas perimetrales de plataforma de trabajo superior':'Barandas perimetrales de plataforma de acceso caracol');
 
   // Acceso gato: una cara estrecha se reserva libre de diagonales.
   const gatoFace=gato?mainPerimeter.find(e=>e.length===750):null;
@@ -377,7 +383,7 @@ export function calculate(config,catalog) {
     extensionsX:extensionX.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index})),
     extensionsY:extensionY.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index}))};
   return {
-    version:'0.3.0',status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
+    version:'0.3.1',status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
     input:{height:H,spanX:x,spanY:y,baysX,baysY,areaM2:x*y/1000000,extensionX:extraX,extensionY:extraY,
       extensionHeightX:modulesX[0]?.height||0,extensionHeightY:modulesY[0]?.height||0,
       extensionModulesX:modulesX.map(m=>({length:m.length,height:m.height})),
@@ -388,7 +394,7 @@ export function calculate(config,catalog) {
       ...footprint,
       note:'Envolvente exterior; no representa la capacidad resistente ni un polígono de estabilidad verificado'},
     access:{mode:gato?'gato':!accessResolved?'pendiente':spiral?'caracol':'escalera con escotillas y cerramientos interiores',hatches:numHatches,
-      ladders:numHatches,metalPlatforms:metalCount,intermediateClosures:closures,
+      ladders:numHatches,metalPlatforms:metalCount,intermediateClosures:closures,guardedLevels,
       hatchLevels:hatchCell?accessLevels(H).filter(level=>even||level>=3):[],
       hatchCell:hatchCell?{row:hatchCell.j+1,column:hatchCell.i+1,width:hatchCell.x,length:hatchCell.y}:null,
       startPlatforms:gato||!hatchCell?[]:(even?[0]:[0,0.5,1])},
