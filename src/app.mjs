@@ -4,11 +4,45 @@ let lastResult=null;
 const $=id=>document.getElementById(id);
 const number=n=>new Intl.NumberFormat('es-CO').format(n);
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bayState={X:[2072],Y:[1400]};
+const formatArea=m2=>new Intl.NumberFormat('es-CO',{minimumFractionDigits:2,maximumFractionDigits:3}).format(m2);
+const options=[750,1400,2072,3000];
 const configuration=()=>({
-  height:Number($('height').value), spanX:Number($('spanX').value),spanY:Number($('spanY').value),
+  height:Number($('height').value),baysX:[...bayState.X],baysY:[...bayState.Y],
   extensionX:$('extensionX').value, extensionY:$('extensionY').value,
   extensionHeightX:$('extensionHeightX').value,extensionHeightY:$('extensionHeightY').value,
 });
+function renderBayRows(axis){
+  const rows=$(`bays${axis}Rows`);
+  rows.innerHTML=bayState[axis].map((value,index)=>`<div class="bay-row">
+    <span class="bay-number">${index+1}.</span>
+    <select data-axis="${axis}" data-index="${index}" aria-label="Módulo ${axis} ${index+1}">
+      ${options.map(length=>`<option value="${length}" ${length===value?'selected':''}>${formatDimension(length)} m</option>`).join('')}
+    </select>
+    <button type="button" class="bay-remove" data-remove="${axis}" data-index="${index}" ${bayState[axis].length===1?'disabled':''} aria-label="Quitar módulo ${axis} ${index+1}" title="Quitar módulo">×</button>
+  </div>`).join('');
+  rows.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>{
+    bayState[axis][Number(el.dataset.index)]=Number(el.value);
+    updateAreaPreview();recalc();
+  }));
+  rows.querySelectorAll('[data-remove]').forEach(button=>button.addEventListener('click',()=>{
+    if(bayState[axis].length===1)return;
+    bayState[axis].splice(Number(button.dataset.index),1);
+    renderBayRows(axis);updateAreaPreview();recalc();
+  }));
+}
+function updateAreaPreview(){
+  const x=bayState.X.reduce((a,b)=>a+b,0),y=bayState.Y.reduce((a,b)=>a+b,0);
+  $('area-preview').textContent=`Área central: ${formatDimension(x)} × ${formatDimension(y)} m = ${formatArea(x*y/1e6)} m² · ${bayState.X.length*bayState.Y.length} bahía(s)`;
+}
+for(const axis of ['X','Y']){
+  renderBayRows(axis);
+  $(`addBay${axis}`).addEventListener('click',()=>{
+    if(bayState[axis].length>=10){toast('Máximo 10 módulos por dirección en esta versión');return;}
+    bayState[axis].push(1400);renderBayRows(axis);updateAreaPreview();recalc();
+  });
+}
+updateAreaPreview();
 function toast(text){const e=$('toast');e.textContent=text;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2300);}
 function statLine(label,value,accent=false){return `<div class="geo-row"><span>${escapeHtml(label)}</span><strong class="${accent?'accent':''}">${escapeHtml(value)}</strong></div>`;}
 function renderDiagram(geo){
@@ -23,13 +57,19 @@ function renderDiagram(geo){
  const grid=[...Array(13)].map((_,i)=>`<line x1="${20+i*31.4}" y1="9" x2="${20+i*31.4}" y2="268" stroke="#f1f5f4"/>`).join('')+
    [...Array(9)].map((_,i)=>`<line y1="${13+i*31}" x1="17" y2="${13+i*31}" x2="400" stroke="#f1f5f4"/>`).join('');
  const fills=polygons.map(p=>`<polygon points="${p.points.map(a=>pt(a).join(',')).join(' ')}" fill="${p.color}" fill-opacity="0.82" stroke="${p.stroke}" stroke-width="2.6" stroke-linejoin="round"/>`).join('');
- const supports=new Set(polygons.flatMap(p=>p.points.map(a=>a.join(','))));
+ const centralGrid=(geo.gridCells||[]).map(c=>{
+   const [a,b]=[pt([c.x0,c.y0]),pt([c.x1,c.y1])];
+   return `<rect x="${a[0]}" y="${b[1]}" width="${b[0]-a[0]}" height="${a[1]-b[1]}" fill="none" stroke="#168a7e" stroke-width="1.45"/>`;
+ }).join('');
+ const supports=new Set((geo.xs||[0,geo.main[1][0]]).flatMap(x=>(geo.ys||[0,geo.main[2][1]]).map(y=>`${x},${y}`)));
+ for(const m of (geo.extensionsX||[]))for(const y of (geo.ys||[0,geo.main[2][1]]))supports.add(`${m.polygon[1][0]},${y}`);
+ for(const m of (geo.extensionsY||[]))for(const x of (geo.xs||[0,geo.main[1][0]]))supports.add(`${x},${m.polygon[2][1]}`);
  const circles=[...supports].map(v=>{const [x,y]=pt(v.split(',').map(Number));return `<circle cx="${x}" cy="${y}" r="5.5" fill="#fff" stroke="#11786e" stroke-width="2.8"/>`;}).join('');
  const center=pt([geo.main[1][0]/2,geo.main[2][1]/2]);
  const label=`<text x="${center[0]}" y="${center[1]-6}" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#146f67" font-weight="800">TORRE CENTRAL</text><text x="${center[0]}" y="${center[1]+10}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#487d7a">${formatDimension(geo.main[1][0])} × ${formatDimension(geo.main[2][1])}</text>`;
  const extTags=extensions.map(m=>{const mid=[m.polygon.reduce((a,p)=>a+p[0],0)/4,m.polygon.reduce((a,p)=>a+p[1],0)/4];return {p:pt(mid),text:`+${m.axis}${m.index}`};})
   .map(t=>`<text x="${t.p[0]}" y="${t.p[1]}" text-anchor="middle" font-weight="800" font-size="12" fill="#496a70">${t.text}</text>`).join('');
- $('footprint').innerHTML=`${grid}${fills}${circles}${label}${extTags}`;
+ $('footprint').innerHTML=`${grid}${fills}${centralGrid}${circles}${label}${extTags}`;
 }
 const describeModules=modules=>modules.length?
   `${modules.length} módulo(s): ${modules.map(m=>`${formatDimension(m.length)} m / H ${m.height} m`).join(' + ')}`:'No requerida';
@@ -41,20 +81,21 @@ function render(r){
  $('metric-supports').textContent=number(r.totals.baseNodes);
  $('metric-pending').textContent=number(r.totals.pendingConcepts ?? r.pending.length);
  $('footer-total').textContent=`Total: ${number(r.totals.listed)} piezas`;
- $('access-mode').textContent=r.access.mode==='caracol'?'Tipo caracol':'Escaleras y escotillas';
+ $('access-mode').textContent=({caracol:'Tipo caracol',gato:'Tipo gato',pendiente:'Pendiente de definir'})[r.access.mode] || 'Escaleras y escotillas';
  $('base-options').textContent=r.input.height<=12?'Planos + ruedas *':'Solo tornillos planos';
  $('base-footnote').textContent=r.input.height<=12?'* Ambas opciones de base se relacionan; en montaje se utiliza una sola.':'Para alturas superiores a 12 m solo se relacionan tornillos niveladores de base plana.';
  $('onebase-label').textContent=r.input.height<=12?'Una opción de base':'Piezas con base plana';
  renderDiagram(r.geometry);
  const m= formatDimension;
  $('geometry-stats').innerHTML=[
-   statLine('Base central',`${m(r.input.spanX)} × ${m(r.input.spanY)} m`),
+   statLine('Área de torre',`${m(r.input.spanX)} × ${m(r.input.spanY)} m · ${formatArea(r.input.areaM2)} m²`),
+   statLine('Módulos de torre',`${r.input.baysX.length} X × ${r.input.baysY.length} Y = ${r.input.baysX.length*r.input.baysY.length} bahías`),
    statLine('Huella exterior',`${m(r.geometry.envelopeX)} × ${m(r.geometry.envelopeY)} m`,true),
    statLine('Extensiones +X',describeModules(r.input.extensionModulesX)),
    statLine('Extensiones +Y',describeModules(r.input.extensionModulesY)),
    statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
-   statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras`),
+   statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras${r.access.hatchCell?` · celda X${r.access.hatchCell.column}/Y${r.access.hatchCell.row}`:''}`),
    statLine('Altura de trabajo',`${r.input.height} m${r.input.height>12?' · ingeniería obligatoria':''}`),
    statLine('Plataformas metálicas',`${r.access.metalPlatforms} unidades`),
  ].join('');
@@ -108,7 +149,7 @@ function updateHeightOptions(){
 }
 updateHeightOptions();
 $('tower-form').addEventListener('submit',ev=>{ev.preventDefault();recalc();});
-$('tower-form').querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>{
+$('tower-form').querySelectorAll('select:not([data-axis])').forEach(el=>el.addEventListener('change',()=>{
  if(el.id==='height')updateHeightOptions();
  recalc();
 }));

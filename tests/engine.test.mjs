@@ -9,7 +9,7 @@ const materialTotal=r=>r.items.reduce((s,i)=>s+i.cantidad,0);
 function verifyMath(r) {
   assert.equal(materialTotal(r),r.totals.listed);
   assert.equal(r.totals.oneBaseOption,r.totals.listed-(r.input.height<=12?r.geometry.supports:0));
-  assert.equal(r.geometry.supports,4+2*(r.input.extensionModulesX.length+r.input.extensionModulesY.length));
+  assert.equal(r.geometry.supports,(r.input.baysX.length+1)*(r.input.baysY.length+1)+(r.input.baysY.length+1)*r.input.extensionModulesX.length+(r.input.baysX.length+1)*r.input.extensionModulesY.length);
   assert.ok(r.items.every(i=>i.cantidad>0 && i.reasons.reduce((s,d)=>s+d.quantity,0)===i.cantidad));
   assert.equal(new Set(r.items.map(i=>i.codigo)).size,r.items.length);
   assert.ok(r.items.every(i=>catalog.some(c=>c.codigo===i.codigo)));
@@ -151,7 +151,7 @@ test('reglas de selección manual, paridad y límites',()=>{
  assert.throws(()=>calculate({height:8,spanX:1400,spanY:1400,extensionHeightX:3},catalog),/altura.*par/);
  assert.throws(()=>calculate({height:50,spanX:3000,spanY:3000,extensionX:3000},catalog),/varios módulos sucesivos/);
  assert.throws(()=>calculate({height:50,spanX:3000,spanY:3000,extensionHeightX:8},catalog),/único módulo/);
- assert.throws(()=>calculate({height:8,spanX:3000,spanY:1400},catalog),/combinación/);
+ assert.ok(calculate({height:8,spanX:3000,spanY:1400},catalog).totals.listed>0);
  const r=calculate({height:8,spanX:1400,spanY:1400,extensionX:1400,extensionY:1400,extensionHeightX:4,extensionHeightY:4},catalog);
  assert.equal(r.geometry.supports,8);verifyMath(r);
 });
@@ -173,4 +173,92 @@ test('matriz completa de 5 bases × alturas 2 a 50: sumas y envolventes',()=>{
    assert.equal(q(r,'AMD.TN.0,60'),r.geometry.supports);
    verifyMath(r);
  }
+});
+
+
+test('16 combinaciones básicas de las cuatro medidas en X e Y',()=>{
+ const measures=[750,1400,2072,3000];
+ for(const x of measures)for(const y of measures) {
+   const r=calculate({height:6,baysX:[x],baysY:[y]},catalog);
+   assert.equal(r.input.spanX,x);
+   assert.equal(r.input.spanY,y);
+   assert.deepEqual(r.input.baysX,[x]);
+   assert.deepEqual(r.input.baysY,[y]);
+   assert.equal(r.input.areaM2,x*y/1000000);
+   assert.equal(r.geometry.gridCells.length,1);
+   verifyMath(r);
+ }
+});
+
+test('malla de 2×2 combinada 0,75 + 1,40 por 2,072 + 3,00: nodos y bahías compartidas',()=>{
+ const r=calculate({height:6,baysX:[750,1400],baysY:[2072,3000]},catalog);
+ assert.equal(r.geometry.supports,9);
+ assert.equal(r.geometry.gridCells.length,4);
+ assert.equal(r.geometry.xs.at(-1),2150);
+ assert.equal(r.geometry.ys.at(-1),5072);
+ assert.equal(r.input.areaM2,2150*5072/1000000);
+ assert.equal(r.access.hatches,3);
+ assert.equal(r.access.hatchCell.column,2);
+ assert.equal(r.access.hatchCell.row,1);
+ assert.equal(q(r,'AMD.PLT ES.2072'),3);
+ assert.equal(q(r,'AMD.PLT.2072'),5); // 2 paño 0,75 + 2 paño 1,40 + 1 arranque
+ assert.equal(q(r,'AMD.PLT.3000'),6);
+ assert.equal(q(r,'AMD.BCLL.0,25'),9);
+ assert.equal(r.input.extensionModulesX.length,0);
+ assert.equal(r.input.extensionModulesY.length,0);
+ // 12 tramos compartidos × 4 niveles estructurales + 8 exteriores × 6 niveles de barandas.
+ // Además, 2 cerramientos internos de 8 horizontales.
+ const horizontalTotal=r.items.filter(i=>i.codigo.startsWith('AMD.HZ.')).reduce((a,b)=>a+b.cantidad,0);
+ assert.equal(horizontalTotal,112);
+ verifyMath(r);
+});
+
+test('malla de 2×1 con dos módulos de X, una extensión en Y usa 3 verticales nuevas',()=>{
+ const r=calculate({height:12,baysX:[750,1400],baysY:[1400]},catalog);
+ assert.equal(r.input.spanX,2150);
+ assert.equal(r.input.spanY,1400);
+ assert.equal(r.input.extensionModulesX.length,1); // 2150 < 12/4,3
+ assert.equal(r.input.extensionModulesY.length,1);
+ assert.equal(r.geometry.supports,6+2+3);
+ assert.equal(q(r,'AMD.BCLL.0,25'),11);
+ verifyMath(r);
+});
+
+test('el módulo 0,75×1,40 tiene caso gato en H≥4, sin escotilla ni escalera',()=>{
+ const r=calculate({height:4,baysX:[750],baysY:[1400]},catalog);
+ assert.equal(r.access.mode,'gato');
+ assert.equal(r.access.hatches,0);
+ assert.equal(r.access.ladders,0);
+ assert.equal(q(r,'AMD.DIG.750'),4); // 2 centrales + 2 en extensión comercial
+ assert.equal(q(r,'AMD.DIG.1400'),5); // 4 centrales + 1 en extensión
+ assert.equal(q(r,'AMD.HZ.750'),22); // estructura + extensión + peldaños gato
+ verifyMath(r);
+});
+
+test('la bahía 0,75×0,75 tiene geometría válida sin inventar una escotilla inexistente',()=>{
+ const r=calculate({height:6,baysX:[750],baysY:[750]},catalog);
+ assert.equal(r.access.mode,'pendiente');
+ assert.equal(r.access.hatches,0);
+ assert.equal(r.access.ladders,0);
+ assert.ok(r.pending.some(x=>x.concepto.includes('Acceso vertical')));
+ assert.equal(q(r,'AMD.PLT ES.1400'),0);
+ assert.equal(q(r,'AMD.PLT.750'),2);
+ verifyMath(r);
+});
+
+test('área modular extensa conserva cálculo H50, apoya en nodos y no inventa códigos de horizontales',()=>{
+ const r=calculate({height:50,baysX:[750,1400,2072],baysY:[1400,3000]},catalog);
+ assert.equal(r.input.spanX,4222);
+ assert.equal(r.input.spanY,4400);
+ assert.equal(r.geometry.gridCells.length,6);
+ assert.equal(q(r,'AMD.RDA.800'),0);
+ assert.ok(r.items.filter(i=>i.codigo.startsWith('AMD.HZ.')).every(i=>[750,1400,2072,3000].some(x=>i.codigo.endsWith(String(x)))));
+ assert.equal(r.geometry.supports,12+3*r.input.extensionModulesX.length+4*r.input.extensionModulesY.length);
+ verifyMath(r);
+});
+
+test('no acepta módulo ajeno al catálogo ni más de 10 por eje',()=>{
+ assert.throws(()=>calculate({height:6,baysX:[850],baysY:[1400]},catalog),/Cada módulo/);
+ assert.throws(()=>calculate({height:6,baysX:Array(11).fill(750),baysY:[1400]},catalog),/entre 1 y 10/);
+ assert.throws(()=>calculate({height:6,baysX:[],baysY:[1400]},catalog),/entre 1 y 10/);
 });

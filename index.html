@@ -17,7 +17,7 @@
         </div>
         <div><div class="brand">CONSTRUYEQUIPOS <span>S.A.S.</span></div><div class="small-label">INGENIERÍA COMERCIAL · RING LOCK</div></div>
       </div>
-      <div class="header-meta"><span class="live-dot"></span> MVP 0.2 <span class="header-sep">·</span> Cálculo trazable</div>
+      <div class="header-meta"><span class="live-dot"></span> MVP 0.3 <span class="header-sep">·</span> Cálculo trazable</div>
     </header>
     <main>
       <section class="page-heading">
@@ -36,10 +36,17 @@
               <label for="height">Altura de trabajo <span class="field-help">metros</span></label>
               <select id="height" name="height"><option value="10" selected>10,00 m</option></select>
             </div>
-            <div class="two-cols">
-              <div class="field-group"><label for="spanX">Largo central X</label><select id="spanX" name="spanX"><option value="1400">1,40 m</option><option value="2072" selected>2,072 m</option><option value="3000">3,00 m</option></select></div>
-              <div class="field-group"><label for="spanY">Ancho central Y</label><select id="spanY" name="spanY"><option value="1400" selected>1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
+            <div class="subheading"><span class="mini-icon">▦</span> Área modular de la torre <span class="auto-tag">4 MEDIDAS</span></div>
+            <p class="field-note">Construye el largo (X) y el ancho (Y) sumando bahías de 0,75 · 1,40 · 2,072 y 3,00 m. Puedes repetir cualquier medida. Las conexiones compartidas se contabilizan una sola vez.</p>
+            <div class="bay-group">
+              <div class="bay-heading"><label id="label-bays-X">Largo X · módulos horizontales</label><button id="addBayX" type="button" class="soft-button bay-add">+ Añadir módulo X</button></div>
+              <div id="baysXRows" class="bay-rows" role="group" aria-labelledby="label-bays-X"></div>
             </div>
+            <div class="bay-group">
+              <div class="bay-heading"><label id="label-bays-Y">Ancho Y · módulos horizontales</label><button id="addBayY" type="button" class="soft-button bay-add">+ Añadir módulo Y</button></div>
+              <div id="baysYRows" class="bay-rows" role="group" aria-labelledby="label-bays-Y"></div>
+            </div>
+            <div class="area-preview" id="area-preview" aria-live="polite">Área central: —</div>
             <div class="config-divider"></div>
             <div class="subheading"><span class="mini-icon">↗</span> Bases extensibles <span class="auto-tag">+X / +Y</span></div>
             <p class="field-note">Las extensiones se disponen en los lados +X y +Y. El modo automático selecciona los módulos comerciales necesarios según H/4,3 por eje. Para alturas elevadas puede utilizar varios módulos sucesivos; no constituye verificación de estabilidad.</p>
@@ -82,7 +89,7 @@
             <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">04</span><div><h2>Pendientes y verificaciones</h2><p>Reglas aún no cerradas para ingeniería y montaje</p></div></div></div>
             <div id="pending-list"></div><div id="warning-list"></div>
           </section>
-          <footer class="app-footer"><strong>CONSTRUYEQUIPOS S.A.S.</strong> · MVP v0.2.0 · Despiece comercial preliminar · No sustituye diseño, inspección ni autorización técnica de montaje.</footer>
+          <footer class="app-footer"><strong>CONSTRUYEQUIPOS S.A.S.</strong> · MVP v0.3.0 · Despiece comercial preliminar · No sustituye diseño, inspección ni autorización técnica de montaje.</footer>
         </div>
       </div>
     </main>
