@@ -1,5 +1,5 @@
 /**
- * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.1
+ * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.2
  * Geometría expresada en milímetros. NO equivale a diseño estructural,
  * certificado de autoestabilidad, plano de montaje ni listado completo de fijaciones.
  * Malla de bahías modulares y extensiones comerciales adyacentes (+X y +Y).
@@ -215,15 +215,22 @@ export function calculate(config,catalog) {
   // Priorizar 1,40×1,40 (acceso caracol conocido) cuando exista.
   const regularCells=cells.filter(c=>c.x>=1400&&c.y>=1400);
   const special750Cell=cells.find(c=>Math.min(c.x,c.y)===750&&Math.max(c.x,c.y)===1400);
+  // Las escotillas comerciales longitudinales también corresponden a bahías
+  // de 0,75×2,072 y 0,75×3,00, en cualquiera de sus orientaciones.
+  const narrowLongCells=cells.filter(c=>Math.min(c.x,c.y)===750&&[2072,3000].includes(Math.max(c.x,c.y)));
   const hatchCell=regularCells.find(c=>c.x===1400&&c.y===1400) ||
-    regularCells[0] || (H===2&&cells.length===1?special750Cell:null);
+    regularCells[0] || narrowLongCells[0] || (H===2&&cells.length===1?special750Cell:null);
   const spiral=Boolean(hatchCell&&hatchCell.x===1400&&hatchCell.y===1400);
+  const narrowLongAccess=Boolean(hatchCell&&Math.min(hatchCell.x,hatchCell.y)===750&&
+    [2072,3000].includes(Math.max(hatchCell.x,hatchCell.y)));
   const gato=cells.length===1&&Math.min(cells[0].x,cells[0].y)===750&&
     Math.max(cells[0].x,cells[0].y)===1400&&H>=4;
   const hatchLength=hatchCell?Math.max(hatchCell.x,hatchCell.y):0;
   const accessResolved=Boolean(hatchCell||gato);
   const numHatches=hatchCell?Math.floor(H/2):0;
-  const closures=spiral||gato||!hatchCell?0:Math.max(0,numHatches-1);
+  // Las bahías estrechas largas se protegen mediante barandas perimetrales;
+  // no sumar también conjuntos de cerramiento interior para los mismos niveles.
+  const closures=spiral||gato||narrowLongAccess||!hatchCell?0:Math.max(0,numHatches-1);
   const lines=new Map(),uniqueHorizontals=new Set(),trace=[];
   const warnings=[
     'DESPIECE COMERCIAL PRELIMINAR. NO ES PLAN DE MONTAJE NI CERTIFICACIÓN DE AUTOESTABILIDAD.',
@@ -238,6 +245,7 @@ export function calculate(config,catalog) {
   }
   if(cells.length>1)warnings.push('La plataforma continua de varios módulos es una estimación por paños; revisar apoyos, interferencias y recorrido de acceso.');
   if(gato)warnings.push('Acceso tipo gato por cara de 0,75 m parametrizado provisionalmente; validar escalones, continuidad de horizontales y protección contra caídas.');
+  if(narrowLongAccess)warnings.push('Acceso longitudinal en bahía de 0,75 m: escaleras, escotillas de 2,072/3,00 m y barandas perimetrales por nivel. Validar la apertura útil de las escotillas, las interferencias entre escaleras, las conexiones y la protección física con el fabricante.');
   if(baysX.includes(750)||baysY.includes(750))warnings.push('Los módulos de 0,75 m requieren verificar ancho útil, tipo de plataforma y recorrido de acceso.');
   if(allExtensionModules.length) {
     warnings.push('Las extensiones en lados adyacentes forman una huella en L asimétrica; el rectángulo envolvente NO define una base estable ni verifica vuelco.');
@@ -290,10 +298,11 @@ export function calculate(config,catalog) {
   // Las escotillas intermedias no representan plataformas completas de trabajo.
   // Solo el último piso recibe barandas de perímetro, salvo acceso caracol
   // de 1,40×1,40, que tiene plataformas de paso en niveles intermedios.
-  const guardedLevels=spiral?accessLevels(H):[H];
+  const guardedLevels=spiral||narrowLongAccess?accessLevels(H):[H];
   for(const level of guardedLevels)for(const offset of [500,1000])for(const edge of mainPerimeter)
     horizontal(edge,level*1000+offset,
-      level===H?'Barandas perimetrales de plataforma de trabajo superior':'Barandas perimetrales de plataforma de acceso caracol');
+      level===H?'Barandas perimetrales de plataforma de trabajo superior':
+      narrowLongAccess?'Barandas perimetrales de acceso longitudinal estrecho':'Barandas perimetrales de plataforma de acceso caracol');
 
   // Acceso gato: una cara estrecha se reserva libre de diagonales.
   const gatoFace=gato?mainPerimeter.find(e=>e.length===750):null;
@@ -337,7 +346,7 @@ export function calculate(config,catalog) {
   if(hatchCell){
     const start=even?(Math.min(hatchCell.x,hatchCell.y)===750?2:1):3;
     metalCount+=start;
-    add(metalCode(hatchLength),start,'Plataformas metálicas de arranque');
+    add(metalCode(hatchLength),start,narrowLongAccess?'Plataformas longitudinales de arranque para apoyo de primera escalera':'Plataformas metálicas de arranque');
     if(spiral){
       metalCount+=2*numHatches;
       add(metalCode(1400),2*numHatches,'Dos plataformas junto a cada escotilla tipo caracol');
@@ -383,7 +392,7 @@ export function calculate(config,catalog) {
     extensionsX:extensionX.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index})),
     extensionsY:extensionY.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index}))};
   return {
-    version:'0.3.1',status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
+    version:'0.3.2',status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
     input:{height:H,spanX:x,spanY:y,baysX,baysY,areaM2:x*y/1000000,extensionX:extraX,extensionY:extraY,
       extensionHeightX:modulesX[0]?.height||0,extensionHeightY:modulesY[0]?.height||0,
       extensionModulesX:modulesX.map(m=>({length:m.length,height:m.height})),
@@ -393,7 +402,7 @@ export function calculate(config,catalog) {
       xs,ys,gridCells:cells.map(c=>({x0:xs[c.i],x1:xs[c.i+1],y0:ys[c.j],y1:ys[c.j+1],i:c.i,j:c.j})),
       ...footprint,
       note:'Envolvente exterior; no representa la capacidad resistente ni un polígono de estabilidad verificado'},
-    access:{mode:gato?'gato':!accessResolved?'pendiente':spiral?'caracol':'escalera con escotillas y cerramientos interiores',hatches:numHatches,
+    access:{mode:gato?'gato':!accessResolved?'pendiente':spiral?'caracol':narrowLongAccess?'estrecho':'escalera con escotillas y cerramientos interiores',hatches:numHatches,
       ladders:numHatches,metalPlatforms:metalCount,intermediateClosures:closures,guardedLevels,
       hatchLevels:hatchCell?accessLevels(H).filter(level=>even||level>=3):[],
       hatchCell:hatchCell?{row:hatchCell.j+1,column:hatchCell.i+1,width:hatchCell.x,length:hatchCell.y}:null,

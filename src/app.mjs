@@ -81,7 +81,7 @@ function render(r){
  $('metric-supports').textContent=number(r.totals.baseNodes);
  $('metric-pending').textContent=number(r.totals.pendingConcepts ?? r.pending.length);
  $('footer-total').textContent=`Total: ${number(r.totals.listed)} piezas`;
- $('access-mode').textContent=({caracol:'Tipo caracol',gato:'Tipo gato',pendiente:'Pendiente de definir'})[r.access.mode] || 'Escaleras y escotillas';
+ $('access-mode').textContent=({caracol:'Tipo caracol',gato:'Tipo gato',estrecho:'Escaleras, escotillas y barandas',pendiente:'Pendiente de definir'})[r.access.mode] || 'Escaleras y escotillas';
  $('base-options').textContent=r.input.height<=12?'Planos + ruedas *':'Solo tornillos planos';
  $('base-footnote').textContent=r.input.height<=12?'* Ambas opciones de base se relacionan; en montaje se utiliza una sola.':'Para alturas superiores a 12 m solo se relacionan tornillos niveladores de base plana.';
  $('onebase-label').textContent=r.input.height<=12?'Una opción de base':'Piezas con base plana';
@@ -96,7 +96,7 @@ function render(r){
    statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
    statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras${r.access.hatchCell?` · celda X${r.access.hatchCell.column}/Y${r.access.hatchCell.row}`:''}`),
-   statLine('Barandas de perímetro',r.access.guardedLevels.length===1?`Solo piso de trabajo superior: ${r.input.height} m`:`${r.access.guardedLevels.length} niveles de acceso caracol (revisión técnica)`),
+   statLine('Barandas de perímetro',r.access.guardedLevels.length===1?`Solo piso de trabajo superior: ${r.input.height} m`:`${r.access.guardedLevels.length} niveles de acceso con barandas (revisión técnica)`),
    statLine('Altura de trabajo',`${r.input.height} m${r.input.height>12?' · ingeniería obligatoria':''}`),
    statLine('Plataformas metálicas',`${r.access.metalPlatforms} unidades`),
  ].join('');

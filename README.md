@@ -1,4 +1,4 @@
-# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.1
+# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.2
 
 Aplicación web estática y local para elaborar **despieces comerciales preliminares** de una torre central de bahías modulares y módulos de extensión adyacentes encadenados. Inventario real de 67 referencias del archivo `PIEZAS CONSTRUYEQUIPOS.xlsx`.
 
@@ -75,3 +75,11 @@ Se dispone de las **16 parejas** básicas y hasta diez módulos por sentido. Si 
 Las escotillas intermedias no son plataformas completas de trabajo por defecto. Por eso las barandas perimetrales de 0,50 y 1,00 m se contabilizan en la plataforma de trabajo superior, mientras que los niveles de acceso intermedios no-caracol conservan sus cerramientos internos provisionales. Para acceso caracol de 1,40×1,40 se mantiene la protección de cada plataforma de tránsito.
 
 **Caso de regresión verificado: 10 m × planta 3×3 m, AMD.HZ.3000 = 24 horizontales de estructura + 8 barandas superiores + 16 cierres de escotillas = 48 (antes 80).** Ahora «Ver cálculo» agrupa los materiales por concepto con subtotales. Si se pretende utilizar pisos intermedios como áreas de trabajo, deben definirse protecciones, rodapiés y plataformas adicionales; no está automatizado en esta versión y no sustituye diseño ni autorización de montaje.
+
+## Corrección 0.3.2 — Acceso en andamios de 0,75 × 2,072 y 0,75 × 3,00
+
+- Ambos tamaños, también girados, incluyen escaleras y escotillas comerciales de **2,072 o 3,00 m** a cada nivel de acceso (en alturas pares 2, 4, …, H; en impares 3, 5, …, H).
+- Para alturas pares, la **primera escalera se apoya sobre dos plataformas longitudinales** de la misma longitud, a 0 m. En alturas impares se conserva el arranque escalonado de tres plataformas; las fijaciones aún requieren validación.
+- Los niveles accesibles de estos paños tienen **dos alturas de barandas perimetrales** (+0,50 y +1 m). Para no duplicar piezas, estas barandas sustituyen los conjuntos de cerramientos interiores previstos para otras formas; las condiciones físicas de las escotillas deben validarse.
+- Se conserva el caso singular **0,75 × 1,40 m a H≥4 m** con acceso tipo gato **sin escaleras ni escotillas apiladas**, por bloqueo de apertura. A H=2 m se conserva la regla anteriormente definida: una escalera y una escotilla, sin escalera superior que bloquee la abertura.
+- El ancho útil de apertura, interferencias entre escaleras, conexiones, barandas y uso en altura requieren revisión técnica; es un despiece comercial preliminar, no instrucciones de montaje.

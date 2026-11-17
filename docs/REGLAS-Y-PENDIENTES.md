@@ -71,3 +71,12 @@
 - **TOTAL AMD.HZ.3000 = 48**, frente a los 80 que contabilizaba erróneamente la versión anterior al suponer barandas exteriores para todos los niveles de tránsito.
 - Los niveles intermedios con escotilla no se consideran pisos completos de trabajo por defecto. Si hay pisos intermedios completos, hacen falta plataformas, barandas y rodapiés adicionales; la aplicación aún no permite configurarlos de manera diferenciada.
 - La protección efectiva contra caídas de cada acceso y las conexiones físicas de cerramientos requieren revisión según el manual del sistema y la normativa aplicable. Este conteo es comercial preliminar, no autorización de montaje.
+
+## Corrección 0.3.2 — Acceso longitudinal en bahías de 0,75 m
+
+- **0,75 × 2,072** y **0,75 × 3,00 m** (rotadas incluidas): escaleras y escotillas longitudinales cada 2 m, con cerramientos perimetrales de dos barandas (+0,50/+1,00 m) en cada nivel de acceso.
+- **Plataforma inicial para H par:** dos plataformas longitudinales de 2,072 o 3,00 m, donde apoya la primera escalera. H impar mantiene tres plataformas escalonadas; falta validar apoyos específicos.
+- **No duplicar los cierres interiores** de escotilla en estas dos geometrías: los cierres se representan con barandas de perímetro y se debe comprobar físicamente la protección y la apertura.
+- **Excepción:** bahía única **0,75 × 1,40 m con H≥4 m** sin escaleras ni escotillas, por bloqueo físico entre escalera superior y escotilla inferior; acceso tipo gato provisional. **H=2 m** conserva el caso previo de una escotilla y una escalera.
+- **0,75 × 0,75 m:** acceso todavía sin resolver; no inventar escotillas.
+- Se deben revisar **separación de barandas, dimensiones útiles de escotilla, interferencia de escaleras y protecciones contra caídas** antes de utilizar la lista para ingeniería o montaje.
