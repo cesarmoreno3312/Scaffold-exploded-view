@@ -6,3 +6,9 @@
 /* Configurador modular de área — v0.3 */
 .bay-group{margin:13px 0 17px}.bay-heading{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap}.bay-heading label{font-weight:700;color:var(--ink)}
 .bay-add{font-size:12px;padding:6px 10px}.bay-rows{display:grid;gap:7px}.bay-row{display:flex;align-items:center;gap:8px}.bay-row select{flex:1;min-width:0;background:white;border:1px solid var(--line);border-radius:9px;padding:9px 10px}.bay-number{min-width:20px;color:var(--soft);font-size:12px;text-align:right}.bay-remove{border:1px solid var(--line);background:#fff;color:#9e342b;border-radius:8px;padding:6px 11px;font-size:20px;line-height:1.05}.bay-remove:disabled{color:#abb5b7;background:#f5f7f7}.area-preview{background:#e7f4f0;border:1px solid #c6e4dc;color:#0b6259;border-radius:10px;padding:10px 12px;font-weight:700;font-size:13px;margin-bottom:15px;line-height:1.55}
+/* Modalidad de cotización sin bases extensibles: señal clara, sin insinuar estabilidad. */
+.client-request-option{margin:14px 0 16px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--faint)}
+.client-request-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;color:var(--ink);line-height:1.4}
+.client-request-label input{margin-top:3px;accent-color:var(--teal);width:17px;height:17px;flex:none;cursor:pointer}
+.client-request-label strong{display:block;font-size:13px}
+.client-request-label small{display:block;font-size:12px;color:var(--soft);margin-top:5px}
