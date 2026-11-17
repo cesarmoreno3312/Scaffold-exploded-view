@@ -1,4 +1,4 @@
-# Matriz de reglas comerciales — MVP 0.3.1
+# Matriz de reglas comerciales — MVP 0.3.3
 
 **No constituye ingeniería estructural ni autorización de montaje.** Las reglas son comerciales preliminares y las excepciones específicas tienen prioridad.
 
@@ -80,3 +80,12 @@
 - **Excepción:** bahía única **0,75 × 1,40 m con H≥4 m** sin escaleras ni escotillas, por bloqueo físico entre escalera superior y escotilla inferior; acceso tipo gato provisional. **H=2 m** conserva el caso previo de una escotilla y una escalera.
 - **0,75 × 0,75 m:** acceso todavía sin resolver; no inventar escotillas.
 - Se deben revisar **separación de barandas, dimensiones útiles de escotilla, interferencia de escaleras y protecciones contra caídas** antes de utilizar la lista para ingeniería o montaje.
+
+## Regla GEO-08 / Versión 0.3.3 — Presupuesto solicitado sin bases extensibles
+
+- Modo optativo **«Sin bases extensibles por solicitud del cliente»**. Mantiene todas las bahías de la torre, calcula sus piezas, no crea extensiones en X/Y y permite que el caso no cumpla H/base ≤ 4,3; **no cambia la selección automática de la modalidad normal**.
+- Se conserva el cociente real en ambos ejes y se indica `meetsCommercialFootprint=false` si no cumple el filtro geométrico. Esto **no equivale a certificar estabilidad de ninguna configuración**.
+- Es obligatorio registrar **sistema de estabilización externa y anclajes pendientes de diseño** fuera del total SKU. No inferir cantidad, ubicación, SKU ni conexión de estos elementos. Las condiciones de carga, resistencia, soporte, cargas de viento, anclajes y programa de montaje requieren proyecto y aprobación técnica.
+- Los totales comerciales incluyen únicamente elementos Ring Lock parametrizados para la torre central y los apoyos disponibles, **sin accesorios de estabilización externos**. El estado del cálculo debe señalar `ESTABILIDAD NO VERIFICADA` y `NO APTO COMO PLAN DE MONTAJE`.
+- La casilla de la interfaz exige una selección explícita, para que pedir una torre sin extensiones no se confunda con el dimensionamiento automático.
+- Se documentan pruebas para H10 de 1,40×1,40 (no cumple H/4,3, 4 apoyos), H12 de 0,75×3,00, H50 de 3×3 y H6 de 1,40×1,40.
