@@ -1,1 +1,96 @@
-The requested file reference is not currently visible. Use files.search or files.list to rediscover the file, then retry with a returned ref_id or file_id.
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Calculadora preliminar de despieces de andamios Ring Lock de CONSTRUYEQUIPOS S.A.S." />
+  <title>Despieces Ring Lock · CONSTRUYEQUIPOS</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+  <script type="module" src="./src/app.mjs"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="identity">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44" fill="none"><path d="M9 10h26M9 22h26M9 34h26M11 9v27M22 9v27M33 9v27" stroke="currentColor" stroke-width="2.3"/><path d="M9 22 33 9M11 36 33 22" stroke="currentColor" stroke-width="2" opacity=".72"/><circle cx="9" cy="10" r="2.5" fill="currentColor"/><circle cx="33" cy="34" r="2.5" fill="currentColor"/></svg>
+        </div>
+        <div><div class="brand">CONSTRUYEQUIPOS <span>S.A.S.</span></div><div class="small-label">INGENIERÍA COMERCIAL · RING LOCK</div></div>
+      </div>
+      <div class="header-meta"><span class="live-dot"></span> MVP 0.1 <span class="header-sep">·</span> Cálculo trazable</div>
+    </header>
+    <main>
+      <section class="page-heading">
+        <div>
+          <div class="eyebrow">SISTEMA DE CÁLCULO / VERSIÓN INICIAL</div>
+          <h1>Despieces <em>Ring Lock</em></h1>
+          <p>Configura la torre, calcula las extensiones y verifica cada componente contra el catálogo real de 67 referencias.</p>
+        </div>
+        <div class="status-pill" title="Alcance funcional del motor">● Alcance controlado</div>
+      </section>
+      <div class="app-layout">
+        <aside class="panel config-panel">
+          <div class="panel-heading"><span class="section-index">01</span><div><h2>Configuración</h2><p>Parámetros de la torre central</p></div></div>
+          <form id="tower-form" autocomplete="off">
+            <div class="field-group">
+              <label for="height">Altura de trabajo <span class="field-help">metros</span></label>
+              <select id="height" name="height">
+                <option value="2">2,00 m</option><option value="4">4,00 m</option>
+                <option value="6">6,00 m</option><option value="8">8,00 m</option>
+                <option value="10" selected>10,00 m</option><option value="12">12,00 m</option>
+              </select>
+            </div>
+            <div class="two-cols">
+              <div class="field-group"><label for="spanX">Largo central X</label><select id="spanX" name="spanX"><option value="1400">1,40 m</option><option value="2072" selected>2,072 m</option><option value="3000">3,00 m</option></select></div>
+              <div class="field-group"><label for="spanY">Ancho central Y</label><select id="spanY" name="spanY"><option value="1400" selected>1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
+            </div>
+            <div class="config-divider"></div>
+            <div class="subheading"><span class="mini-icon">↗</span> Bases extensibles <span class="auto-tag">EN L</span></div>
+            <p class="field-note">Las extensiones se disponen en los lados +X y +Y. El modo automático selecciona la menor longitud comercial que alcanza H/4 por eje.</p>
+            <div class="two-cols">
+              <div class="field-group"><label for="extensionX">Extensión X</label><select id="extensionX" name="extensionX"><option value="auto">Automática</option><option value="0">Sin extensión</option><option value="750">0,75 m</option><option value="1400">1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
+              <div class="field-group"><label for="extensionY">Extensión Y</label><select id="extensionY" name="extensionY"><option value="auto">Automática</option><option value="0">Sin extensión</option><option value="750">0,75 m</option><option value="1400">1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
+            </div>
+            <div class="two-cols">
+              <div class="field-group"><label for="extensionHeightX">Altura ext. X</label><select id="extensionHeightX" name="extensionHeightX"><option value="auto">Automática</option><option value="2">2 m</option><option value="4">4 m</option><option value="6">6 m</option><option value="8">8 m</option><option value="10">10 m</option><option value="12">12 m</option></select></div>
+              <div class="field-group"><label for="extensionHeightY">Altura ext. Y</label><select id="extensionHeightY" name="extensionHeightY"><option value="auto">Automática</option><option value="2">2 m</option><option value="4">4 m</option><option value="6">6 m</option><option value="8">8 m</option><option value="10">10 m</option><option value="12">12 m</option></select></div>
+            </div>
+            <div class="config-divider"></div>
+            <div class="read-only-field"><span>Sistema de acceso</span><strong id="access-mode">—</strong></div>
+            <div class="read-only-field"><span>Alternativas de apoyo</span><strong>Planos + ruedas *</strong></div>
+            <button type="submit" class="primary-button">↻ &nbsp; Recalcular despiece</button>
+            <p class="footnote">* Ambas opciones de base se relacionan; para montar la torre se utiliza una sola opción.</p>
+          </form>
+        </aside>
+        <div class="results-area">
+          <section class="metric-grid" aria-label="Indicadores del despiece">
+            <article class="metric-card featured"><div class="metric-label">Piezas relacionadas <span>AMBAS BASES</span></div><div class="metric-value" id="metric-total">—</div><div class="metric-footer">Sin diagonalados pendientes</div></article>
+            <article class="metric-card"><div class="metric-label">Una opción de base</div><div class="metric-value" id="metric-onebase">—</div><div class="metric-footer">Piezas para una alternativa</div></article>
+            <article class="metric-card"><div class="metric-label">Puntos de apoyo</div><div class="metric-value" id="metric-supports">—</div><div class="metric-footer">Nodos únicos</div></article>
+            <article class="metric-card"><div class="metric-label">Pendientes sin SKU</div><div class="metric-value" id="metric-pending">—</div><div class="metric-footer">No incluidos en el total</div></article>
+          </section>
+          <section class="panel geometry-panel">
+            <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">02</span><div><h2>Geometría y acceso</h2><p>Planta esquemática de módulos y apoyos</p></div></div><span class="small-quiet">NO ES PLANO DE MONTAJE</span></div>
+            <div class="geometry-content">
+              <div class="diagram-wrapper"><svg id="footprint" viewBox="0 0 420 285" role="img" aria-label="Planta de la torre central y las extensiones"></svg><div class="legend"><span><i class="legend-dot central"></i> Torre central</span><span><i class="legend-dot extension"></i> Extensiones</span><span><i class="legend-dot support"></i> Apoyos</span></div></div>
+              <div class="geometry-stats" id="geometry-stats"></div>
+            </div>
+          </section>
+          <section class="panel bom-panel">
+            <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">03</span><div><h2>Despiece consolidado</h2><p>Referencias del inventario con detalle de origen</p></div></div><div class="button-group"><button id="download-csv" class="soft-button" type="button">↓ CSV</button><button id="download-json" class="soft-button" type="button">↓ JSON</button></div></div>
+            <div class="table-toolbar"><label class="search-box"><span>⌕</span><input id="filter" placeholder="Buscar por código o descripción…" aria-label="Filtrar piezas"/></label><div class="record-count" id="record-count">— referencias</div></div>
+            <div class="table-container"><table><thead><tr><th>Referencia</th><th>Descripción comercial</th><th>Detalle</th><th class="right">Cantidad</th></tr></thead><tbody id="bom-body"><tr><td colspan="4">Cargando inventario…</td></tr></tbody></table></div>
+            <div class="table-footer"><span>Las filas son referencias comerciales únicas</span><strong id="footer-total">Total: —</strong></div>
+          </section>
+          <section class="panel notices-panel">
+            <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">04</span><div><h2>Pendientes y verificaciones</h2><p>Reglas aún no cerradas para ingeniería y montaje</p></div></div></div>
+            <div id="pending-list"></div><div id="warning-list"></div>
+          </section>
+          <footer class="app-footer"><strong>CONSTRUYEQUIPOS S.A.S.</strong> · MVP v0.1.0 · Despiece comercial preliminar · No sustituye diseño, inspección ni autorización técnica de montaje.</footer>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="toast" aria-live="polite" role="status"></div>
+</body>
+</html>
