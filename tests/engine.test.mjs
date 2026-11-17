@@ -13,8 +13,13 @@ function verifyMath(r) {
   assert.ok(r.items.every(i=>i.cantidad>0 && i.reasons.reduce((s,d)=>s+d.quantity,0)===i.cantidad));
   assert.equal(new Set(r.items.map(i=>i.codigo)).size,r.items.length);
   assert.ok(r.items.every(i=>catalog.some(c=>c.codigo===i.codigo)));
-  assert.ok(r.geometry.envelopeX*43>=r.input.height*10000);
-  assert.ok(r.geometry.envelopeY*43>=r.input.height*10000);
+  if(r.geometry.meetsCommercialFootprint){
+    assert.ok(r.geometry.envelopeX*43>=r.input.height*10000);
+    assert.ok(r.geometry.envelopeY*43>=r.input.height*10000);
+  }else{
+    assert.ok(r.pending.some(p=>p.concepto.includes('estabilización externa')));
+    assert.ok(r.status.includes('ESTABILIDAD NO VERIFICADA'));
+  }
   assert.ok(r.warnings.some(w=>w.includes('NO ES PLAN DE MONTAJE')));
 }
 
@@ -158,7 +163,12 @@ test('reglas de selección manual, paridad y límites',()=>{
  assert.throws(()=>calculate({height:51,spanX:3000,spanY:3000},catalog),/2 a 50 m/);
  assert.throws(()=>calculate({height:1,spanX:1400,spanY:1400},catalog),/2 a 50 m/);
  assert.throws(()=>calculate({height:10.5,spanX:3000,spanY:3000},catalog),/metros enteros/);
- assert.throws(()=>calculate({height:10,spanX:2072,spanY:1400,extensionX:0},catalog),/criterio comercial/);
+ const sinExtensionX=calculate({height:10,spanX:2072,spanY:1400,extensionX:'0',extensionY:'auto'},catalog);
+ assert.equal(sinExtensionX.input.extensionX,0);
+ assert.ok(sinExtensionX.input.extensionY>0);
+ assert.equal(sinExtensionX.geometry.meetsCommercialFootprint,false);
+ assert.ok(sinExtensionX.pending.some(p=>p.concepto.includes('estabilización externa')));
+ verifyMath(sinExtensionX);
  assert.throws(()=>calculate({height:8,spanX:1400,spanY:1400,extensionHeightX:3},catalog),/altura.*par/);
  assert.throws(()=>calculate({height:50,spanX:3000,spanY:3000,extensionX:3000},catalog),/varios módulos sucesivos/);
  assert.throws(()=>calculate({height:50,spanX:3000,spanY:3000,extensionHeightX:8},catalog),/único módulo/);
