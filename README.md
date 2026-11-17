@@ -1,4 +1,4 @@
-# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.2
+# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.3
 
 Aplicación web estática y local para elaborar **despieces comerciales preliminares** de una torre central de bahías modulares y módulos de extensión adyacentes encadenados. Inventario real de 67 referencias del archivo `PIEZAS CONSTRUYEQUIPOS.xlsx`.
 
@@ -83,3 +83,16 @@ Las escotillas intermedias no son plataformas completas de trabajo por defecto. 
 - Los niveles accesibles de estos paños tienen **dos alturas de barandas perimetrales** (+0,50 y +1 m). Para no duplicar piezas, estas barandas sustituyen los conjuntos de cerramientos interiores previstos para otras formas; las condiciones físicas de las escotillas deben validarse.
 - Se conserva el caso singular **0,75 × 1,40 m a H≥4 m** con acceso tipo gato **sin escaleras ni escotillas apiladas**, por bloqueo de apertura. A H=2 m se conserva la regla anteriormente definida: una escalera y una escotilla, sin escalera superior que bloquee la abertura.
 - El ancho útil de apertura, interferencias entre escaleras, conexiones, barandas y uso en altura requieren revisión técnica; es un despiece comercial preliminar, no instrucciones de montaje.
+
+## Modalidad sin bases extensibles (v0.3.3)
+
+Se añadió la casilla **«Calcular torre sin bases extensibles (solicitud del cliente)»**. Esta opción es deliberada y no modifica el comportamiento del modo automático.
+
+- Al marcarla, la app calcula el inventario de la torre **sin agregar ninguna extensión X o Y**, aunque su altura exceda el límite geométrico comercial H/base 4,3:1.
+- El resultado muestra la **relación H/base calculada** y si cumple el filtro geométrico, sin equiparar dicho filtro a una certificación de estabilidad.
+- Se genera el despiece de torre, pisos de acceso y apoyos según las reglas del inventario, pero se registra como **pendiente** el sistema de estabilidad: anclajes, amarres, conexiones, viento, cargas y condiciones de apoyo; estas piezas y verificaciones **no se cuantifican ni se suman**.
+- En CSV y JSON las advertencias y conceptos pendientes quedan documentados, por lo que el resultado no se puede interpretar como lista completa ni como autorización de montaje.
+- La casilla desactiva temporalmente los selectores de extensiones X/Y y sus alturas; al desmarcarla vuelve la selección anterior y el modo automático.
+- Una solicitud sin extensiones **no implica que la torre sea apta para trabajar sin estabilización externa**. No calculamos anclajes ni su ubicación: requieren ingeniería y condiciones reales del emplazamiento.
+
+Regresiones: H10 base 1,40×1,40 sin extensiones (antes bloqueada), H12 base 0,75×3,00, H50 base 3×3, H6 base 1,40×1,40 y rechazo de entradas manuales contradictorias. 
