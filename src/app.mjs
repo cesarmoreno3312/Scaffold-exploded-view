@@ -1,4 +1,4 @@
-import {calculate,formatDimension} from './engine.mjs';
+import {calculate,formatDimension} from './engine.mjs?v=0.3.4';
 let catalog=[];
 let lastResult=null;
 const $=id=>document.getElementById(id);
@@ -83,9 +83,14 @@ function render(r){
  $('metric-onebase').textContent=number(r.totals.oneBaseOption);
  $('metric-supports').textContent=number(r.totals.baseNodes);
  $('metric-pending').textContent=number(r.totals.pendingConcepts ?? r.pending.length);
- $('footer-total').textContent=r.input.clientRequestedNoExtensions?
+ $('footer-total').textContent=r.input.clientRequestedNoExtensions||!r.geometry.meetsCommercialFootprint?
    `Despiece preliminar: ${number(r.totals.listed)} piezas · anclajes no incluidos`:
    `Total: ${number(r.totals.listed)} piezas`;
+ const notice=$('geometry-warning-banner');
+ const needsEngineering=r.input.clientRequestedNoExtensions||!r.geometry.meetsCommercialFootprint;
+ notice.hidden=!needsEngineering;
+ notice.textContent=needsEngineering?
+   'DESPIECE GENERADO · ESTABILIDAD NO VERIFICADA. Esta selección no cumple el filtro H/4,3 o se pidió sin extensiones; se excluyen anclajes y amarres que requieren diseño de ingeniería. NO APTO COMO PLAN DE MONTAJE.':'';
  $('access-mode').textContent=({caracol:'Tipo caracol',gato:'Tipo gato',estrecho:'Escaleras, escotillas y barandas',pendiente:'Pendiente de definir'})[r.access.mode] || 'Escaleras y escotillas';
  $('base-options').textContent=r.input.height<=12?'Planos + ruedas *':'Solo tornillos planos';
  $('base-footnote').textContent=r.input.height<=12?'* Ambas opciones de base se relacionan; en montaje se utiliza una sola.':'Para alturas superiores a 12 m solo se relacionan tornillos niveladores de base plana.';
@@ -135,6 +140,7 @@ function recalc(){
    lastResult=null;
    for(const id of ['metric-total','metric-onebase','metric-supports','metric-pending']) $(id).textContent='—';
    $('footer-total').textContent='No hay despiece válido';
+   $('geometry-warning-banner').hidden=true;
  }
 }
 function save(name,contents,type){const blob=new Blob([contents],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('Archivo generado');}

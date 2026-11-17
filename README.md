@@ -1,4 +1,4 @@
-# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.3
+# CONSTRUYEQUIPOS S.A.S. — Despieces Ring Lock · MVP 0.3.4
 
 Aplicación web estática y local para elaborar **despieces comerciales preliminares** de una torre central de bahías modulares y módulos de extensión adyacentes encadenados. Inventario real de 67 referencias del archivo `PIEZAS CONSTRUYEQUIPOS.xlsx`.
 
@@ -96,3 +96,11 @@ Se añadió la casilla **«Calcular torre sin bases extensibles (solicitud del c
 - Una solicitud sin extensiones **no implica que la torre sea apta para trabajar sin estabilización externa**. No calculamos anclajes ni su ubicación: requieren ingeniería y condiciones reales del emplazamiento.
 
 Regresiones: H10 base 1,40×1,40 sin extensiones (antes bloqueada), H12 base 0,75×3,00, H50 base 3×3, H6 base 1,40×1,40 y rechazo de entradas manuales contradictorias. 
+
+## Corrección 0.3.4 — «Sin extensión» funciona directamente
+
+- Elegir **«Sin extensión»** en X o Y **no bloquea el despiece**, aunque falle el filtro comercial H/base ≤ 4,3. Si ambos selectores están en «Sin extensión», el resultado es una torre completa sin bases extensibles, **sin necesidad de otra casilla**.
+- La casilla de solicitud sigue siendo una alternativa rápida para suprimir ambas extensiones. **Automática** sigue incorporando las extensiones que alcance el criterio.
+- Se identifica el déficit de huella y se añade el concepto de **estabilización externa, anclajes y amarres por definir** sin inventar cantidades. En caso de déficit se muestra una advertencia visible encima de los indicadores.
+- Se preservan los despieces de 6 m 1,40×1,40 sin extensiones, de 10 m 3×3 (48 horizontales 3.000 mm) y las reglas de acceso estrecho y alturas mayores. Las selecciones que ya cumplen el criterio sin extensiones no reciben una advertencia artificial.
+- El sitio usa archivos con versión para reducir problemas de caché del navegador al actualizar GitHub Pages.

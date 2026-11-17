@@ -12,3 +12,7 @@
 .client-request-label input{margin-top:3px;accent-color:var(--teal);width:17px;height:17px;flex:none;cursor:pointer}
 .client-request-label strong{display:block;font-size:13px}
 .client-request-label small{display:block;font-size:12px;color:var(--soft);margin-top:5px}
+
+/* Advertencia visible también antes de desplazarse a los pendientes. */
+.geometry-warning-banner{padding:13px 15px;margin-bottom:16px;border-radius:11px;border:1px solid #bf7a2c;background:#fff6e9;color:#643e0f;font-weight:650;font-size:13px;line-height:1.5}
+.geometry-warning-banner[hidden]{display:none!important}

@@ -1,5 +1,5 @@
 /**
- * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.3
+ * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.4
  * Geometría expresada en milímetros. NO equivale a diseño estructural,
  * certificado de autoestabilidad, plano de montaje ni listado completo de fijaciones.
  * Malla de bahías modulares y extensiones comerciales adyacentes (+X y +Y).
@@ -48,9 +48,12 @@ function chooseModules(baseMm, targetMm, requested) {
   if(requested!==undefined && requested!==null && requested!=='auto') {
     const value=Number(requested);
     invariant([0,...SPANS].includes(value), 'La extensión debe ser de 0; 0,75; 1,40; 2,072 o 3,00 m.');
+    // «Sin extensión» es una solicitud comercial válida aun cuando no
+    // alcance H/4,3. El déficit se advierte, nunca bloquea el inventario.
+    if(value===0)return [];
     invariant(baseMm+value>=targetMm,
       `La extensión seleccionada no alcanza el criterio comercial de ${meters(targetMm)} m. Utiliza «Automática» para permitir varios módulos sucesivos.`);
-    return value?[value]:[];
+    return [value];
   }
   const need=Math.max(0,targetMm-baseMm);
   if(!need)return [];
@@ -204,8 +207,16 @@ export function calculate(config,catalog) {
   // El cliente puede solicitar SOLO el inventario de una torre sin extensiones.
   // Es un modo independiente del dimensionamiento comercial automático: no equivale
   // a autorizar la torre ni determina los anclajes/arriostramientos necesarios.
-  const clientRequestedNoExtensions=config.clientRequestedNoExtensions===true;
-  if(clientRequestedNoExtensions)for(const axis of ['X','Y']) {
+  // Ambos selectores en «Sin extensión» equivalen al modo del cliente:
+  // NO hace falta marcar una segunda casilla para obtener el despiece.
+  const explicitlyZero=value=>value===0||value==='0';
+  const bothSelectorsWithoutExtensions=explicitlyZero(config.extensionX)&&explicitlyZero(config.extensionY);
+  // Un par de ceros que YA cumple H/base no necesita aviso de déficit;
+  // el aviso reforzado se reserva para una solicitud fuera del filtro.
+  const wouldFallOutsideFilter=x*43<H*10000||y*43<H*10000;
+  const clientRequestedNoExtensions=config.clientRequestedNoExtensions===true||
+    (bothSelectorsWithoutExtensions&&wouldFallOutsideFilter);
+  if(config.clientRequestedNoExtensions===true)for(const axis of ['X','Y']) {
     const requested=config[`extension${axis}`];
     invariant(requested===undefined||requested===null||requested==='auto'||Number(requested)===0,
       'Modalidad sin bases extensibles: elimina las extensiones manuales en X e Y.');
@@ -250,14 +261,15 @@ export function calculate(config,catalog) {
     'Validar la selección con/sin espigo, anclajes, fijaciones y cerramientos según manual del fabricante.',
   ];
   const pending=[];
-  if(clientRequestedNoExtensions) {
-    warnings.unshift('SOLICITUD DEL CLIENTE: cálculo solo de piezas de la torre SIN BASES EXTENSIBLES. NO SE HA VERIFICADO SU ESTABILIDAD Y NO SE AUTORIZA EL MONTAJE.');
+  if(clientRequestedNoExtensions||!meetsCommercialFootprint) {
+    if(clientRequestedNoExtensions)
+      warnings.unshift('SOLICITUD DEL CLIENTE: cálculo de piezas de la torre SIN BASES EXTENSIBLES. LA ESTABILIDAD NO ESTÁ VERIFICADA Y NO SE AUTORIZA EL MONTAJE.');
     if(!meetsCommercialFootprint)
-      warnings.push('NO CUMPLE EL FILTRO GEOMÉTRICO COMERCIAL H/base ≤ 4,3 en ambos ejes. Esto no impide emitir un presupuesto preliminar, pero la estabilidad deberá resolverse mediante diseño de ingeniería y una solución de estabilización adecuada.');
+      warnings.push('NO CUMPLE EL FILTRO GEOMÉTRICO COMERCIAL H/base ≤ 4,3 en uno o ambos ejes. El despiece se calcula para presupuestar, pero debe diseñarse una estabilización adecuada antes de cualquier montaje.');
     pending.push({
       concepto:'Diseño de estabilización externa, anclajes y amarres',
       cantidad:'por definir',unidad:'sistema según ingeniería',
-      motivo:'La configuración solicitada no incluye extensiones. Ubicación, cantidad y referencias de anclajes, amarres, uniones y verificaciones de cargas requieren proyecto técnico; no se inventan ni se suman al despiece.'
+      motivo:'La configuración se ha solicitado sin extensiones o sin cumplir H/base ≤ 4,3. No se calculan ni se suman anclajes, amarres, uniones o resistencias: se requiere ingeniería según el emplazamiento.'
     });
   }
   if(!accessResolved) {
@@ -414,8 +426,10 @@ export function calculate(config,catalog) {
     extensionsX:extensionX.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index})),
     extensionsY:extensionY.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index}))};
   return {
-    version:'0.3.3',status:clientRequestedNoExtensions?
+    version:'0.3.4',status:clientRequestedNoExtensions?
       'DESPIECE SOLICITADO SIN EXTENSIONES — ESTABILIDAD NO VERIFICADA — NO APTO COMO PLAN DE MONTAJE':
+      !meetsCommercialFootprint?
+      'DESPIECE DE CONFIGURACIÓN FUERA DEL FILTRO GEOMÉTRICO — ESTABILIDAD NO VERIFICADA — NO APTO COMO PLAN DE MONTAJE':
       'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
     input:{height:H,spanX:x,spanY:y,baysX,baysY,areaM2:x*y/1000000,clientRequestedNoExtensions,extensionX:extraX,extensionY:extraY,
       extensionHeightX:modulesX[0]?.height||0,extensionHeightY:modulesY[0]?.height||0,

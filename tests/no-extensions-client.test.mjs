@@ -23,7 +23,9 @@ function check(r) {
 }
 
 test('H10, 1,40×1,40: genera despiece por solicitud de cliente SIN extensiones aunque incumple 4,3:1',()=>{
-  assert.throws(()=>calculate({height:10,spanX:1400,spanY:1400,extensionX:0,extensionY:0},catalog),/criterio comercial/);
+  const sinCasilla=calculate({height:10,spanX:1400,spanY:1400,extensionX:'0',extensionY:'0'},catalog);
+  check(sinCasilla);
+  assert.equal(sinCasilla.geometry.meetsCommercialFootprint,false);
   const r=calculate({height:10,spanX:1400,spanY:1400,clientRequestedNoExtensions:true},catalog);
   check(r);
   assert.equal(r.geometry.meetsCommercialFootprint,false);
@@ -81,4 +83,42 @@ test('H6, 1,40×1,40: despiece sin bases extensibles y filtro geométrico cumpli
 test('La modalidad especial no mezcla módulos de extensión pedidos manualmente',()=>{
   assert.throws(()=>calculate({height:10,spanX:1400,spanY:1400,clientRequestedNoExtensions:true,
     extensionX:'1400',extensionY:'0'},catalog),/elimina las extensiones manuales/);
+});
+
+test('Selector Sin extensión en X e Y funciona sin casilla especial para altura alta y base pequeña',()=>{
+ for(const height of [8,10,12,17,50]){
+   const r=calculate({height,spanX:1400,spanY:1400,extensionX:'0',extensionY:'0'},catalog);
+   check(r);
+   assert.equal(r.geometry.supports,4);
+   assert.equal(r.geometry.meetsCommercialFootprint,false);
+   assert.ok(r.items.length>0);
+ }
+});
+
+test('Sin extensión solo en X y automática Y: devuelve despiece parcial con advertencia y sin inventar anclajes',()=>{
+ const r=calculate({height:10,spanX:2072,spanY:1400,extensionX:'0',extensionY:'auto'},catalog);
+ assert.equal(r.input.extensionX,0);
+ assert.ok(r.input.extensionY>0);
+ assert.equal(r.geometry.meetsCommercialFootprint,false);
+ assert.equal(r.input.clientRequestedNoExtensions,false);
+ assert.ok(r.totals.listed>0);
+ assert.ok(r.pending.some(p=>p.concepto.includes('estabilización externa')));
+ assert.ok(r.status.includes('ESTABILIDAD NO VERIFICADA'));
+ assert.equal(qty(r,'AMD.ARR.48.3X600'),0);
+});
+
+test('La selección automática sigue añadiendo extensiones y no exige la casilla',()=>{
+ const r=calculate({height:10,spanX:1400,spanY:1400,extensionX:'auto',extensionY:'auto'},catalog);
+ assert.equal(r.input.clientRequestedNoExtensions,false);
+ assert.ok(r.input.extensionX>0 && r.input.extensionY>0);
+ assert.equal(r.geometry.meetsCommercialFootprint,true);
+});
+
+test('Sin extensión elegida directamente y filtro ya cumplido conserva despiece normal H6',()=>{
+ const r=calculate({height:6,spanX:1400,spanY:1400,extensionX:'0',extensionY:'0'},catalog);
+ assert.equal(r.input.extensionX,0);
+ assert.equal(r.input.extensionY,0);
+ assert.equal(r.geometry.meetsCommercialFootprint,true);
+ assert.equal(r.input.clientRequestedNoExtensions,false);
+ assert.equal(r.pending.length,0);
 });
