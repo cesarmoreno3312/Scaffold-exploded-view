@@ -1,5 +1,5 @@
 /**
- * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.2
+ * CONSTRUYEQUIPOS S.A.S. | Motor preliminar de despieces Ring Lock v0.3.3
  * Geometría expresada en milímetros. NO equivale a diseño estructural,
  * certificado de autoestabilidad, plano de montaje ni listado completo de fijaciones.
  * Malla de bahías modulares y extensiones comerciales adyacentes (+X y +Y).
@@ -201,14 +201,26 @@ export function calculate(config,catalog) {
   // son geometrías válidas. El acceso puede quedar pendiente cuando no hay
   // una escotilla comercial compatible con la configuración elegida.
 
+  // El cliente puede solicitar SOLO el inventario de una torre sin extensiones.
+  // Es un modo independiente del dimensionamiento comercial automático: no equivale
+  // a autorizar la torre ni determina los anclajes/arriostramientos necesarios.
+  const clientRequestedNoExtensions=config.clientRequestedNoExtensions===true;
+  if(clientRequestedNoExtensions)for(const axis of ['X','Y']) {
+    const requested=config[`extension${axis}`];
+    invariant(requested===undefined||requested===null||requested==='auto'||Number(requested)===0,
+      'Modalidad sin bases extensibles: elimina las extensiones manuales en X e Y.');
+  }
   // 4,3 = 43/10 exacto. Altura en m -> dimensión mm mínima = ceil(H*10000/43).
   const target=Math.ceil(H*10000/43);
-  const modulesX=resolveModules(x,target,H,config.extensionX,config.extensionHeightX,'X');
-  const modulesY=resolveModules(y,target,H,config.extensionY,config.extensionHeightY,'Y');
+  const modulesX=clientRequestedNoExtensions?[]:
+    resolveModules(x,target,H,config.extensionX,config.extensionHeightX,'X');
+  const modulesY=clientRequestedNoExtensions?[]:
+    resolveModules(y,target,H,config.extensionY,config.extensionHeightY,'Y');
   const extensionX=extensionGeometry('X',x,y,modulesX);
   const extensionY=extensionGeometry('Y',x,y,modulesY);
   const allExtensionModules=[...extensionX,...extensionY];
   const extraX=sum(modulesX.map(m=>m.length)), extraY=sum(modulesY.map(m=>m.length));
+  const meetsCommercialFootprint=(x+extraX>=target&&y+extraY>=target);
   const supports=mainNodes+extensionX.length*ys.length+extensionY.length*xs.length;
   const even=H%2===0;
   // La escotilla se asigna a una sola bahía central apta para tránsito.
@@ -238,6 +250,16 @@ export function calculate(config,catalog) {
     'Validar la selección con/sin espigo, anclajes, fijaciones y cerramientos según manual del fabricante.',
   ];
   const pending=[];
+  if(clientRequestedNoExtensions) {
+    warnings.unshift('SOLICITUD DEL CLIENTE: cálculo solo de piezas de la torre SIN BASES EXTENSIBLES. NO SE HA VERIFICADO SU ESTABILIDAD Y NO SE AUTORIZA EL MONTAJE.');
+    if(!meetsCommercialFootprint)
+      warnings.push('NO CUMPLE EL FILTRO GEOMÉTRICO COMERCIAL H/base ≤ 4,3 en ambos ejes. Esto no impide emitir un presupuesto preliminar, pero la estabilidad deberá resolverse mediante diseño de ingeniería y una solución de estabilización adecuada.');
+    pending.push({
+      concepto:'Diseño de estabilización externa, anclajes y amarres',
+      cantidad:'por definir',unidad:'sistema según ingeniería',
+      motivo:'La configuración solicitada no incluye extensiones. Ubicación, cantidad y referencias de anclajes, amarres, uniones y verificaciones de cargas requieren proyecto técnico; no se inventan ni se suman al despiece.'
+    });
+  }
   if(!accessResolved) {
     warnings.push('NO HAY SISTEMA DE ACCESO CONFIRMADO: esta combinación geométrica carece de bahía para una escotilla comercial o regla de acceso validada.');
     pending.push({concepto:'Acceso vertical y plataformas de tránsito',cantidad:'por definir',unidad:'componentes',
@@ -392,12 +414,14 @@ export function calculate(config,catalog) {
     extensionsX:extensionX.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index})),
     extensionsY:extensionY.map(m=>({polygon:m.polygon,length:m.length,height:m.height,index:m.index}))};
   return {
-    version:'0.3.2',status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
-    input:{height:H,spanX:x,spanY:y,baysX,baysY,areaM2:x*y/1000000,extensionX:extraX,extensionY:extraY,
+    version:'0.3.3',status:clientRequestedNoExtensions?
+      'DESPIECE SOLICITADO SIN EXTENSIONES — ESTABILIDAD NO VERIFICADA — NO APTO COMO PLAN DE MONTAJE':
+      'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
+    input:{height:H,spanX:x,spanY:y,baysX,baysY,areaM2:x*y/1000000,clientRequestedNoExtensions,extensionX:extraX,extensionY:extraY,
       extensionHeightX:modulesX[0]?.height||0,extensionHeightY:modulesY[0]?.height||0,
       extensionModulesX:modulesX.map(m=>({length:m.length,height:m.height})),
       extensionModulesY:modulesY.map(m=>({length:m.length,height:m.height}))},
-    geometry:{target,ratioLimit:GEOMETRIC_RATIO_LIMIT,envelopeX:x+extraX,envelopeY:y+extraY,
+    geometry:{target,ratioLimit:GEOMETRIC_RATIO_LIMIT,meetsCommercialFootprint,envelopeX:x+extraX,envelopeY:y+extraY,
       ratioX:H*1000/(x+extraX),ratioY:H*1000/(y+extraY),supports,
       xs,ys,gridCells:cells.map(c=>({x0:xs[c.i],x1:xs[c.i+1],y0:ys[c.j],y1:ys[c.j+1],i:c.i,j:c.j})),
       ...footprint,
