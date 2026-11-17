@@ -1,4 +1,4 @@
-# CONSTRUYEQUIPOS S.A.S. · Despieces Ring Lock (MVP)
+# CONSTRUYEQUIPOS S.A.S. · Despieces Ring Lock (MVP 0.1.1)
 
 Aplicación web local y estática para generar **despieces comerciales preliminares** de una torre central Ring Lock y hasta dos extensiones adosadas en forma de L, con trazabilidad de cada referencia de inventario.
 
@@ -26,7 +26,7 @@ Las pruebas se ejecutan también automáticamente con GitHub Actions al subir el
 
 - Una única bahía central en las combinaciones **1.40×1.40, 2.072×1.40 (o rotada), 2.072×2.072 o 3.00×3.00 m**.
 - Alturas de trabajo **pares de 2 a 12 m**.
-- Hasta dos extensiones adosadas en **lados +X y +Y**, formando una L, seleccionadas automática o manualmente.
+- Hasta dos extensiones adosadas en **lados +X y +Y**, formando una L, seleccionadas automática o manualmente. **Se admiten cero extensiones** cuando la base central ya cumple `H/base ≤ 4,3` en ambos ejes.
 - Extensiones comerciales de **0.75, 1.40, 2.072 y 3.00 m**.
 - Cálculo de horizontales únicas por coordenadas/elevación; todas las barandas en niveles de 2 m.
 - Diagonales por caras centrales y caras expuestas de extensiones, sin doble diagonal en caras compartidas.
@@ -43,7 +43,9 @@ Las pruebas se ejecutan también automáticamente con GitHub Actions al subir el
 2. Las **alturas automáticas de las extensiones** son hipótesis comerciales: `2 × round((H − 4 × dimensiónCentralEnElEje) / 2)` acotadas entre 2 m y H. Se pueden sobrescribir. Pendiente validación del criterio.
 3. La selección de **vertical terminal con/sin espigo** y fijación de los cerramientos interiores requiere validación con el manual del sistema.
 4. Se cuentan **dos barandas perimetrales a +0.50 y +1.00 m** para cada plataforma con escotilla de la torre central. La posición de los niveles debe validarse según el uso.
-5. El criterio `H / 4` se utiliza **solo para elegir un tamaño comercial de extensión**, y el rectángulo exterior es una **envolvente**, no una validación de estabilidad.
+5. El criterio `H / 4,3` (mínimo redondeado hacia arriba al milímetro) se utiliza **solo para elegir si hacen falta extensiones y su longitud comercial**, y el rectángulo exterior es una **envolvente**, no una validación de estabilidad. Ejemplo: **6 m, 1,40 × 1,40 m, sin extensiones**, ya que 6/1,40 = 4,286 ≤ 4,3.
+
+La **altura tentativa de las extensiones** sigue usando por separado la fórmula provisional `H − 4 × dimensión central`, aún pendiente de validación; no debe confundirse con el nuevo umbral de selección de base.
 6. No se incluyen cálculos de esfuerzos, momentos de vuelco, capacidad de carga, viento, suelo, anclajes, contrapesos, configuración de arriostramientos especiales, ni certificados.
 
 ## Fuera de alcance del MVP
