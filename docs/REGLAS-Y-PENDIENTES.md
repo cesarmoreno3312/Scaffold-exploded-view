@@ -1,4 +1,4 @@
-# Matriz de reglas comerciales — MVP 0.3.0
+# Matriz de reglas comerciales — MVP 0.3.1
 
 **No constituye ingeniería estructural ni autorización de montaje.** Las reglas son comerciales preliminares y las excepciones específicas tienen prioridad.
 
@@ -13,7 +13,7 @@
 | GEO-07 | Altura de cada módulo escalonada aproximadamente `H−4×(ancho central + módulos internos)`, con paridad de H. | **Provisional** |
 | EST-01 | H par: horizontales estructurales a 0,2,…H. | Implementada |
 | EST-02 | H impar: horizontales estructurales a 0,1,3,…H. | Implementada |
-| EST-03 | Dos alturas de baranda (+0,50 y +1 m) en cada nivel de acceso de la torre central. | Hipótesis comercial |
+| EST-03 | Dos alturas de baranda (+0,50 y +1 m) sobre la plataforma superior de trabajo. La bahía 1400×1400 con acceso caracol conserva barandas en niveles intermedios con plataformas de tránsito; los otros niveles intermedios se tratan como accesos con escotilla, no pisos completos. | Regla comercial implementada; validar protección física |
 | EST-04 | Deducción de horizontales físicas repetidas por coordenadas, SKU y elevación. | Implementada |
 | EST-05 | Diagonal en cada cara central por cada tramo de 2 m; en extensiones, en caras expuestas. | Implementada por tramos completos |
 | EST-06 | Diagonal de 1 m en tramo incompleto de extensión. | **No calculada** |
@@ -63,3 +63,11 @@
 - Caso único 0,75×1,40 m de H=2: escotilla superior y dos plataformas de arranque. H≥4: acceso gato preliminar, sin escotillas ni escaleras y con la cara estrecha de acceso sin diagonales.
 - Cuando ninguna bahía tiene acceso establecido (p.ej. **0,75×0,75** o **0,75×2,072** aisladas), la app **muestra un despiece estructural parcial**, con concepto de acceso pendiente; no inventa referencia de escotilla.
 - La estimación de plataformas, bases extensibles y estabilidad de torres de varios módulos **no es un plano, certificación ni aprobación de montaje**. Debe validarse la selección de bay de acceso, continuidad de piso, plataformas de paso, diagonales y apoyos compartidos.
+## Corrección 0.3.1 — Horizontales de 3000 mm para H=10 m y base 3×3 m
+
+- Estructura: 6 niveles (0,2,4,6,8,10 m) × 4 lados = **24** horizontales de 3000 mm.
+- Dos barandas sobre la plataforma de trabajo superior: 2 alturas (10,50 y 11 m) × 4 lados = **8** horizontales de 3000 mm.
+- Cerramientos interiores de cuatro escotillas de acceso intermedias: 4 cierres × 4 horizontales largos = **16** horizontales de 3000 mm.
+- **TOTAL AMD.HZ.3000 = 48**, frente a los 80 que contabilizaba erróneamente la versión anterior al suponer barandas exteriores para todos los niveles de tránsito.
+- Los niveles intermedios con escotilla no se consideran pisos completos de trabajo por defecto. Si hay pisos intermedios completos, hacen falta plataformas, barandas y rodapiés adicionales; la aplicación aún no permite configurarlos de manera diferenciada.
+- La protección efectiva contra caídas de cada acceso y las conexiones físicas de cerramientos requieren revisión según el manual del sistema y la normativa aplicable. Este conteo es comercial preliminar, no autorización de montaje.
