@@ -96,6 +96,7 @@ function render(r){
    statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
    statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras${r.access.hatchCell?` · celda X${r.access.hatchCell.column}/Y${r.access.hatchCell.row}`:''}`),
+   statLine('Barandas de perímetro',r.access.guardedLevels.length===1?`Solo piso de trabajo superior: ${r.input.height} m`:`${r.access.guardedLevels.length} niveles de acceso caracol (revisión técnica)`),
    statLine('Altura de trabajo',`${r.input.height} m${r.input.height>12?' · ingeniería obligatoria':''}`),
    statLine('Plataformas metálicas',`${r.access.metalPlatforms} unidades`),
  ].join('');
@@ -103,12 +104,17 @@ function render(r){
  $('warning-list').innerHTML=r.warnings.map((w,i)=>`<div class="warning-item">${i===0?'<strong>Limitación de seguridad y alcance</strong>':''}${escapeHtml(w)}</div>`).join('');
  renderTable();
 }
+function groupedBreakdown(reasons){
+ const groups=new Map();
+ for(const reason of reasons)groups.set(reason.reason,(groups.get(reason.reason)||0)+reason.quantity);
+ return [...groups.entries()].map(([name,quantity])=>`<div><strong>${number(quantity)}×</strong> ${escapeHtml(name)}</div>`).join('');
+}
 function renderTable(){
  if(!lastResult)return;
  const term=$('filter').value.trim().toLowerCase();
  const rows=lastResult.items.filter(row=>[row.codigo,row.descripcion].some(a=>a.toLowerCase().includes(term)));
  $('record-count').textContent=`${rows.length} de ${lastResult.items.length} referencias`;
- $('bom-body').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.codigo)}</td><td>${escapeHtml(row.descripcion)}</td><td><details class="details"><summary>Ver cálculo</summary><div class="breakdown">${row.reasons.map(v=>`<div><strong>${number(v.quantity)}×</strong> ${escapeHtml(v.reason)}</div>`).join('')}</div></details></td><td class="right">${number(row.cantidad)}</td></tr>`).join(''):'<tr><td colspan="4">No hay referencias que coincidan con la búsqueda.</td></tr>';
+ $('bom-body').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.codigo)}</td><td>${escapeHtml(row.descripcion)}</td><td><details class="details"><summary>Ver cálculo</summary><div class="breakdown">${groupedBreakdown(row.reasons)}</div></details></td><td class="right">${number(row.cantidad)}</td></tr>`).join(''):'<tr><td colspan="4">No hay referencias que coincidan con la búsqueda.</td></tr>';
 }
 function recalc(){
  try{const r=calculate(configuration(),catalog);render(r);}catch(err){
