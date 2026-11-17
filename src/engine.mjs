@@ -4,6 +4,8 @@
  * Alcance: torre central de una bahía, H par 2..12m, hasta dos extensiones en L.
  */
 export const SPANS = [750, 1400, 2072, 3000];
+// Criterio comercial H/base <= 4,3. No equivale a un factor de seguridad estructural.
+export const GEOMETRIC_RATIO_LIMIT = 4.3;
 export const CENTRAL_SPANS = [1400, 2072, 3000];
 export const HATCH_SPANS = [1400, 2072, 3000];
 
@@ -73,7 +75,9 @@ export function calculate(config, catalog) {
   invariant((x === 1400 && y === 1400) || (x === 2072 && y === 1400) || (x === 1400 && y === 2072) || (x === 2072 && y === 2072) || (x === 3000 && y === 3000),
     'Esta combinación de dimensiones aún no está parametrizada. Opciones: 1,40×1,40; 2,072×1,40; 2,072×2,072 o 3×3 m.');
   invariant([x, y].some((s) => HATCH_SPANS.includes(s)), 'No se encontró longitud comercial de escotilla.');
-  const target = H * 250;
+  // H/4,3, redondeado hacia arriba al milímetro. 4,3 = 43/10 exacto.
+  // Ejemplo: 6 m -> 1.396 mm requeridos; base de 1.400 mm sin extensiones.
+  const target = Math.ceil(H * 10000 / 43);
   const ex = chooseExtension(x, target, config.extensionX);
   const ey = chooseExtension(y, target, config.extensionY);
   invariant(ex !== undefined && ey !== undefined, 'No existe una extensión comercial suficiente en este modelo.');
@@ -97,8 +101,8 @@ export function calculate(config, catalog) {
   const trace = [];
   const warnings = [
     'Despiece comercial preliminar. La relación H/base no certifica autoestabilidad ni autoriza montaje.',
-    'Las extensiones en L generan una huella asimétrica; revisar vuelco, cargas, anclajes, apoyos y arriostramientos.',
-    'Las alturas de extensión calculadas automáticamente son hipótesis comerciales ajustables, no criterios de ingeniería aprobados.',
+    ...(ex || ey ? ['Las extensiones adosadas pueden generar una huella asimétrica; revisar vuelco, cargas, apoyos y arriostramientos.',
+    'Las alturas de extensión calculadas automáticamente son hipótesis comerciales ajustables, no criterios de ingeniería aprobados.'] : []),
     'Seleccionar verticales terminales con/sin espigo y el montaje de los cerramientos según especificación técnica del fabricante.',
   ];
   const pending = [];
@@ -207,9 +211,9 @@ export function calculate(config, catalog) {
   invariant(uniqueHorizontals.size === items.filter((row)=>row.codigo.startsWith('AMD.HZ.')).reduce((a,b)=>a+b.cantidad,0) - (spiral ? 0 : (numHatches - 1) * 8), 'Inconsistencia en horizontales físicas.');
 
   return {
-    version:'0.1.0', status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
+    version:'0.1.1', status:'PRELIMINAR — NO APTO COMO PLAN DE MONTAJE',
     input:{height:H,spanX:x,spanY:y,extensionX:ex,extensionY:ey,extensionHeightX:hx,extensionHeightY:hy},
-    geometry:{target:target, envelopeX:x+ex,envelopeY:y+ey, ratioX:(H*1000)/(x+ex),ratioY:(H*1000)/(y+ey),supports,
+    geometry:{target:target, ratioLimit:GEOMETRIC_RATIO_LIMIT, envelopeX:x+ex,envelopeY:y+ey, ratioX:(H*1000)/(x+ex),ratioY:(H*1000)/(y+ey),supports,
       main:[[0,0],[x,0],[x,y],[0,y]],extensionX:ex?[[x,0],[x+ex,0],[x+ex,y],[x,y]]:null,
       extensionY:ey?[[0,y],[x,y],[x,y+ey],[0,y+ey]]:null,
       note:'Envolvente exterior, no polígono de apoyo ni prueba de estabilidad'},

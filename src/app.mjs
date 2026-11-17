@@ -43,7 +43,7 @@ function render(r){
    statLine('Huella exterior',`${m(r.geometry.envelopeX)} × ${m(r.geometry.envelopeY)} m`,true),
    statLine('Extensión +X',r.input.extensionX?`${m(r.input.extensionX)} m · H ${r.input.extensionHeightX} m`:'No requerida'),
    statLine('Extensión +Y',r.input.extensionY?`${m(r.input.extensionY)} m · H ${r.input.extensionHeightY} m`:'No requerida'),
-   statLine('Criterio preliminar',`H / 4 = ${m(r.geometry.target)} m`),
+   statLine('Criterio comercial 4,3:1',`H / 4,3 ≈ ${m(r.geometry.target)} m (mínimo)`),
    statLine('Relación envolvente',`${r.geometry.ratioX.toFixed(2)} : 1 / ${r.geometry.ratioY.toFixed(2)} : 1`),
    statLine('Acceso',`${r.access.hatches} escotillas · ${r.access.ladders} escaleras`),
    statLine('Plataformas metálicas',`${r.access.metalPlatforms} unidades`),
