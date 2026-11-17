@@ -61,8 +61,8 @@ test('10 m 2,072×1,40 mantiene regresiones del MVP',()=>{
   assert.deepEqual(r.input.extensionModulesX,[{length:750,height:2}]);
   assert.deepEqual(r.input.extensionModulesY,[{length:1400,height:4}]);
   assert.equal(q(r,'AMD.HZ.750'),20);
-  assert.equal(q(r,'AMD.HZ.1400'),40);
-  assert.equal(q(r,'AMD.HZ.2072'),51);
+  assert.equal(q(r,'AMD.HZ.1400'),24);
+  assert.equal(q(r,'AMD.HZ.2072'),35);
   assert.equal(q(r,'AMD.DIG.750'),2);
   assert.equal(q(r,'AMD.DIG.1400'),15);
   assert.equal(q(r,'AMD.DIG.2072'),12);
@@ -74,13 +74,24 @@ test('10 m 2,072×1,40 mantiene regresiones del MVP',()=>{
   verifyMath(r);
 });
 
-test('10 m 3×3 sin extensiones ni diagonalados pendientes',()=>{
+test('10 m 3×3: horizontales 3000 mm son 24 estructurales + 8 barandas superiores + 16 cierres = 48',()=>{
  const r=calculate({height:10,spanX:3000,spanY:3000},catalog);
  assert.equal(r.geometry.supports,4);
  assert.equal(r.pending.length,0);
  assert.equal(q(r,'AMD.HZ.750'),16);
- assert.equal(q(r,'AMD.HZ.3000'),80);
+ assert.equal(q(r,'AMD.HZ.3000'),48);
  assert.equal(q(r,'AMD.PLT.3000'),8);
+ const row=r.items.find(i=>i.codigo==='AMD.HZ.3000');
+ const subtotals=new Map();
+ for(const line of row.reasons)subtotals.set(line.reason,(subtotals.get(line.reason)||0)+line.quantity);
+ assert.equal(subtotals.get('Horizontales de torre central'),24);
+ assert.equal(subtotals.get('Barandas perimetrales de plataforma de trabajo superior'),8);
+ assert.equal(subtotals.get('Horizontales largas de cierres de escotillas intermedias'),16);
+ assert.equal([...subtotals.values()].reduce((a,b)=>a+b,0),48);
+ assert.deepEqual(r.access.guardedLevels,[10]);
+ const guardTraces=r.trace.filter(t=>t.reason==='Barandas perimetrales de plataforma de trabajo superior' && t.codigo==='AMD.HZ.3000');
+ assert.equal(guardTraces.length,8);
+ assert.ok(guardTraces.every(t=>/Nivel 10[.]50 m|Nivel 11[.]00 m/.test(t.details)));
  verifyMath(r);
 });
 
@@ -206,10 +217,10 @@ test('malla de 2×2 combinada 0,75 + 1,40 por 2,072 + 3,00: nodos y bahías comp
  assert.equal(q(r,'AMD.BCLL.0,25'),9);
  assert.equal(r.input.extensionModulesX.length,0);
  assert.equal(r.input.extensionModulesY.length,0);
- // 12 tramos compartidos × 4 niveles estructurales + 8 exteriores × 6 niveles de barandas.
+ // 12 tramos compartidos × 4 niveles estructurales + 8 exteriores × 2 barandas del piso superior.
  // Además, 2 cerramientos internos de 8 horizontales.
  const horizontalTotal=r.items.filter(i=>i.codigo.startsWith('AMD.HZ.')).reduce((a,b)=>a+b.cantidad,0);
- assert.equal(horizontalTotal,112);
+ assert.equal(horizontalTotal,80);
  verifyMath(r);
 });
 
@@ -231,7 +242,7 @@ test('el módulo 0,75×1,40 tiene caso gato en H≥4, sin escotilla ni escalera'
  assert.equal(r.access.ladders,0);
  assert.equal(q(r,'AMD.DIG.750'),4); // 2 centrales + 2 en extensión comercial
  assert.equal(q(r,'AMD.DIG.1400'),5); // 4 centrales + 1 en extensión
- assert.equal(q(r,'AMD.HZ.750'),22); // estructura + extensión + peldaños gato
+ assert.equal(q(r,'AMD.HZ.750'),20); // estructura + extensión + peldaños gato
  verifyMath(r);
 });
 
