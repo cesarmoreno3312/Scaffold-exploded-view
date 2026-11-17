@@ -17,14 +17,14 @@
         </div>
         <div><div class="brand">CONSTRUYEQUIPOS <span>S.A.S.</span></div><div class="small-label">INGENIERÍA COMERCIAL · RING LOCK</div></div>
       </div>
-      <div class="header-meta"><span class="live-dot"></span> MVP 0.1.1 <span class="header-sep">·</span> Cálculo trazable</div>
+      <div class="header-meta"><span class="live-dot"></span> MVP 0.2 <span class="header-sep">·</span> Cálculo trazable</div>
     </header>
     <main>
       <section class="page-heading">
         <div>
           <div class="eyebrow">SISTEMA DE CÁLCULO / VERSIÓN INICIAL</div>
           <h1>Despieces <em>Ring Lock</em></h1>
-          <p>Configura la torre, calcula las extensiones y verifica cada componente contra el catálogo real de 67 referencias.</p>
+          <p>Calcula despieces comerciales de torres entre 2 y 50 m, con módulos de extensión escalonados y referencias del inventario. No sustituye el diseño estructural.</p>
         </div>
         <div class="status-pill" title="Alcance funcional del motor">● Alcance controlado</div>
       </section>
@@ -34,40 +34,36 @@
           <form id="tower-form" autocomplete="off">
             <div class="field-group">
               <label for="height">Altura de trabajo <span class="field-help">metros</span></label>
-              <select id="height" name="height">
-                <option value="2">2,00 m</option><option value="4">4,00 m</option>
-                <option value="6">6,00 m</option><option value="8">8,00 m</option>
-                <option value="10" selected>10,00 m</option><option value="12">12,00 m</option>
-              </select>
+              <select id="height" name="height"><option value="10" selected>10,00 m</option></select>
             </div>
             <div class="two-cols">
               <div class="field-group"><label for="spanX">Largo central X</label><select id="spanX" name="spanX"><option value="1400">1,40 m</option><option value="2072" selected>2,072 m</option><option value="3000">3,00 m</option></select></div>
               <div class="field-group"><label for="spanY">Ancho central Y</label><select id="spanY" name="spanY"><option value="1400" selected>1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
             </div>
             <div class="config-divider"></div>
-            <div class="subheading"><span class="mini-icon">↗</span> Bases extensibles <span class="auto-tag">EN L</span></div>
-            <p class="field-note">Las extensiones se disponen en los lados +X y +Y. El modo automático selecciona la menor longitud comercial que respeta H/base ≤ 4,3:1 por eje. Si la base central cumple, no requiere extensiones.</p>
+            <div class="subheading"><span class="mini-icon">↗</span> Bases extensibles <span class="auto-tag">+X / +Y</span></div>
+            <p class="field-note">Las extensiones se disponen en los lados +X y +Y. El modo automático selecciona los módulos comerciales necesarios según H/4,3 por eje. Para alturas elevadas puede utilizar varios módulos sucesivos; no constituye verificación de estabilidad.</p>
             <div class="two-cols">
               <div class="field-group"><label for="extensionX">Extensión X</label><select id="extensionX" name="extensionX"><option value="auto">Automática</option><option value="0">Sin extensión</option><option value="750">0,75 m</option><option value="1400">1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
               <div class="field-group"><label for="extensionY">Extensión Y</label><select id="extensionY" name="extensionY"><option value="auto">Automática</option><option value="0">Sin extensión</option><option value="750">0,75 m</option><option value="1400">1,40 m</option><option value="2072">2,072 m</option><option value="3000">3,00 m</option></select></div>
             </div>
             <div class="two-cols">
-              <div class="field-group"><label for="extensionHeightX">Altura ext. X</label><select id="extensionHeightX" name="extensionHeightX"><option value="auto">Automática</option><option value="2">2 m</option><option value="4">4 m</option><option value="6">6 m</option><option value="8">8 m</option><option value="10">10 m</option><option value="12">12 m</option></select></div>
-              <div class="field-group"><label for="extensionHeightY">Altura ext. Y</label><select id="extensionHeightY" name="extensionHeightY"><option value="auto">Automática</option><option value="2">2 m</option><option value="4">4 m</option><option value="6">6 m</option><option value="8">8 m</option><option value="10">10 m</option><option value="12">12 m</option></select></div>
+              <div class="field-group"><label for="extensionHeightX">Altura ext. X</label><select id="extensionHeightX" name="extensionHeightX"><option value="auto">Automática</option></select></div>
+              <div class="field-group"><label for="extensionHeightY">Altura ext. Y</label><select id="extensionHeightY" name="extensionHeightY"><option value="auto">Automática</option></select></div>
             </div>
             <div class="config-divider"></div>
             <div class="read-only-field"><span>Sistema de acceso</span><strong id="access-mode">—</strong></div>
-            <div class="read-only-field"><span>Alternativas de apoyo</span><strong>Planos + ruedas *</strong></div>
+            <div class="read-only-field"><span>Alternativas de apoyo</span><strong id="base-options">Planos + ruedas *</strong></div>
             <button type="submit" class="primary-button">↻ &nbsp; Recalcular despiece</button>
-            <p class="footnote">* Ambas opciones de base se relacionan; para montar la torre se utiliza una sola opción.</p>
+            <p class="footnote" id="base-footnote">* Ambas opciones de base se relacionan; para montar la torre se utiliza una sola opción.</p>
           </form>
         </aside>
         <div class="results-area">
           <section class="metric-grid" aria-label="Indicadores del despiece">
-            <article class="metric-card featured"><div class="metric-label">Piezas relacionadas <span>AMBAS BASES</span></div><div class="metric-value" id="metric-total">—</div><div class="metric-footer">Sin diagonalados pendientes</div></article>
-            <article class="metric-card"><div class="metric-label">Una opción de base</div><div class="metric-value" id="metric-onebase">—</div><div class="metric-footer">Piezas para una alternativa</div></article>
+            <article class="metric-card featured"><div class="metric-label">Piezas relacionadas <span>AMBAS BASES</span></div><div class="metric-value" id="metric-total">—</div><div class="metric-footer">No incluye conjuntos sin SKU confirmado</div></article>
+            <article class="metric-card"><div class="metric-label" id="onebase-label">Una opción de base</div><div class="metric-value" id="metric-onebase">—</div><div class="metric-footer">Piezas para una alternativa</div></article>
             <article class="metric-card"><div class="metric-label">Puntos de apoyo</div><div class="metric-value" id="metric-supports">—</div><div class="metric-footer">Nodos únicos</div></article>
-            <article class="metric-card"><div class="metric-label">Pendientes sin SKU</div><div class="metric-value" id="metric-pending">—</div><div class="metric-footer">No incluidos en el total</div></article>
+            <article class="metric-card"><div class="metric-label">Conceptos pendientes</div><div class="metric-value" id="metric-pending">—</div><div class="metric-footer">No incluidos en el total</div></article>
           </section>
           <section class="panel geometry-panel">
             <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">02</span><div><h2>Geometría y acceso</h2><p>Planta esquemática de módulos y apoyos</p></div></div><span class="small-quiet">NO ES PLANO DE MONTAJE</span></div>
@@ -86,7 +82,7 @@
             <div class="panel-heading horizontal"><div class="title-cluster"><span class="section-index">04</span><div><h2>Pendientes y verificaciones</h2><p>Reglas aún no cerradas para ingeniería y montaje</p></div></div></div>
             <div id="pending-list"></div><div id="warning-list"></div>
           </section>
-          <footer class="app-footer"><strong>CONSTRUYEQUIPOS S.A.S.</strong> · MVP v0.1.1 · Despiece comercial preliminar · No sustituye diseño, inspección ni autorización técnica de montaje.</footer>
+          <footer class="app-footer"><strong>CONSTRUYEQUIPOS S.A.S.</strong> · MVP v0.2.0 · Despiece comercial preliminar · No sustituye diseño, inspección ni autorización técnica de montaje.</footer>
         </div>
       </div>
     </main>
