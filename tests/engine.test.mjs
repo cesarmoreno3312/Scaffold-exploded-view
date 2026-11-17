@@ -13,6 +13,40 @@ function verifyMath(r) {
   assert.ok(r.items.every(i=>catalog.some(c=>c.codigo===i.codigo)));
 }
 
+
+test('6 m 1,40×1,40: criterio 4,3:1, sin extensiones en automático ni manual', () => {
+  for (const settings of [{}, {extensionX:0,extensionY:0}]) {
+    const r = calculate({height:6,spanX:1400,spanY:1400,...settings}, catalog);
+    assert.equal(r.geometry.target,1396);
+    assert.equal(r.geometry.ratioLimit,4.3);
+    assert.equal(r.geometry.ratioX <= 4.3,true);
+    assert.equal(r.geometry.ratioY <= 4.3,true);
+    assert.deepEqual([r.input.extensionX,r.input.extensionY,r.input.extensionHeightX,r.input.extensionHeightY],[0,0,0,0]);
+    assert.equal(r.geometry.supports,4);
+    assert.equal(r.access.hatches,3);
+    assert.equal(r.access.ladders,3);
+    assert.equal(r.access.metalPlatforms,7);
+    assert.equal(q(r,'AMD.HZ.750'),0);
+    assert.equal(q(r,'AMD.HZ.1400'),40);
+    assert.equal(q(r,'AMD.DIG.1400'),12);
+    assert.equal(q(r,'AMD.PPS.0,25'),12);
+    assert.equal(q(r,'AMD.BCLL.0,25'),4);
+    assert.equal(q(r,'AMD.TN.0,60'),4);
+    assert.equal(q(r,'AMD.RDA.800'),4);
+    assert.equal(r.pending.length,0);
+    assert.ok(!r.warnings.some(w=>w.includes('huella asimétrica')));
+    verifyMath(r);
+  }
+});
+
+test('8 m 1,40×1,40: con 4,3:1 aún requiere extensión en ambos ejes', () => {
+  const r = calculate({height:8,spanX:1400,spanY:1400},catalog);
+  assert.equal(r.input.extensionX,750);
+  assert.equal(r.input.extensionY,750);
+  assert.throws(()=>calculate({height:8,spanX:1400,spanY:1400,extensionX:0,extensionY:0},catalog),/criterio comercial/);
+  verifyMath(r);
+});
+
 test('8 m 1,40×1,40, dos extensiones en L de 0,75 m: sin cerramiento interior', () => {
   const r = calculate({height:8,spanX:1400,spanY:1400}, catalog);
   assert.deepEqual([r.input.extensionX,r.input.extensionY,r.input.extensionHeightX,r.input.extensionHeightY],[750,750,2,2]);
@@ -84,7 +118,7 @@ test('matriz de regresión para las 5 bases admitidas y 6 alturas',()=>{
  const bases=[[1400,1400],[1400,2072],[2072,1400],[2072,2072],[3000,3000]];
  for(const [spanX,spanY] of bases)for(const height of [2,4,6,8,10,12]){
   const r=calculate({height,spanX,spanY},catalog);
-  assert.ok(r.geometry.envelopeX>=height*250 && r.geometry.envelopeY>=height*250);
+  assert.ok(r.geometry.envelopeX * 43 >= height * 10000 && r.geometry.envelopeY * 43 >= height * 10000);
   assert.equal(r.access.hatches,height/2);
   assert.equal(r.totals.unmapped,2*Number(r.input.extensionX>0)+2*Number(r.input.extensionY>0));
   assert.equal(r.geometry.supports,4+2*Number(r.input.extensionX>0)+2*Number(r.input.extensionY>0));
