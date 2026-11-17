@@ -67,22 +67,27 @@ tests/               Pruebas unitarias y casos de regresión
 server.mjs           Servidor estático sin dependencias
 ```
 
-## Github
+## Ver la aplicación en GitHub
 
-1. Crea un repositorio privado llamado `construyequipos-despieces` en tu cuenta.
-2. Descomprime los archivos de este paquete en la carpeta del repositorio.
-3. En esa carpeta ejecuta:
+- **Código fuente:** https://github.com/cesarmoreno3312/Scaffold-exploded-view
+- **Aplicación web (GitHub Pages):** https://cesarmoreno3312.github.io/Scaffold-exploded-view/
+- **Estado de publicación y pruebas:** https://github.com/cesarmoreno3312/Scaffold-exploded-view/actions
 
-```bash
-git init
-git branch -M main
-git add .
-git commit -m "feat: MVP calculadora Ring Lock con inventario y pruebas"
-git remote add origin https://github.com/cesarmoreno3312/construyequipos-despieces.git
-git push -u origin main
-```
+### Activar la publicación por primera vez
 
-Si el repositorio fue creado con README inicial, conviene clonar primero y copiar allí estos archivos para evitar conflictos de historial.
+En GitHub abre **Settings → Pages → Build and deployment → Source → GitHub Actions**.
+El workflow `.github/workflows/deploy-pages.yml` ejecuta las pruebas y publica
+`index.html`, `src/` y `data/` automáticamente al actualizar `main`.
+Hasta que GitHub Pages esté habilitado y el workflow termine correctamente, la
+dirección pública puede mostrar error 404.
+
+### Actualizaciones
+
+La rama `main` contiene el MVP 0.1. Cada cambio de código en esta rama ejecuta
+los tests y, si GitHub Pages está configurado, actualiza la aplicación web.
+
+**Importante:** el repositorio es **público** y los archivos subidos son visibles
+para terceros. No agregar datos privados, secretos ni credenciales.
 
 ## Fuente del inventario
 
