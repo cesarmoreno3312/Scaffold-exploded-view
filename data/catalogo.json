@@ -1,0 +1,270 @@
+[
+  {
+    "codigo": "AMD.ARR.48.3X350",
+    "descripcion": "Abrazadera Arriostre 350mm x 48.3 mm"
+  },
+  {
+    "codigo": "AMD.ARR.48.3X600",
+    "descripcion": "Abrazadera Arriostre 600mm x 48.3 mm"
+  },
+  {
+    "codigo": "AMD.ABCÑ.48.3",
+    "descripcion": "Abrazadera con Cuña"
+  },
+  {
+    "codigo": "AMD.ABR.48.3",
+    "descripcion": "Abrazadera con roseta"
+  },
+  {
+    "codigo": "AMD.ABE.48.3",
+    "descripcion": "Abrazadera Espigo"
+  },
+  {
+    "codigo": "AMD.ABF.48.3",
+    "descripcion": "Abrazadera fija 48.3 mm"
+  },
+  {
+    "codigo": "AMD.ABG.48.3",
+    "descripcion": "Abrazadera Giratoria 48.3 mm"
+  },
+  {
+    "codigo": "AMD.ABGC.48.3",
+    "descripcion": "Abrazadera Giratoria chanel 48.3 mm"
+  },
+  {
+    "codigo": "AMD.ABM.48.3",
+    "descripcion": "Abrazadera Melliza"
+  },
+  {
+    "codigo": "AMD.BDA.EXT.ESC PEL.3000X2000",
+    "descripcion": "Baranda Externa para escalera de peldaño de 3000mm x 2000 mm"
+  },
+  {
+    "codigo": "AMD.BDA INT ESC PEL.3000X2000",
+    "descripcion": "Baranda Interna para escalera de peldaño de 3000mmx2000 mm"
+  },
+  {
+    "codigo": "AMD.BCLL.0,25",
+    "descripcion": "Base collar 330 mm"
+  },
+  {
+    "codigo": "CONTRAPESO",
+    "descripcion": "Contrapeso 25 Kg ZPL.630"
+  },
+  {
+    "codigo": "AMD.DIG.1400",
+    "descripcion": "Diagonal 1400x2000 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.DIG.2072",
+    "descripcion": "Diagonal 2072x2000 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.DIG.3000",
+    "descripcion": "Diagonal 3000x2000 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.DIG.750",
+    "descripcion": "Diagonal 750x2000 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.ESC.2200",
+    "descripcion": "Escalera de acceso 2.200 mm"
+  },
+  {
+    "codigo": "AMD.ESC PEL.3000X2000",
+    "descripcion": "Escalera peldaño aluminio de 3000mm x 2000 mm"
+  },
+  {
+    "codigo": "AMD.HZ.1400",
+    "descripcion": "Horizontal 1400 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.HZ.2072",
+    "descripcion": "Horizontal 2072 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.HZ.3000",
+    "descripcion": "Horizontal 3000 mm (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.HZ.750",
+    "descripcion": "Horizontal 750 mm. (48 ,3x3,25mm)"
+  },
+  {
+    "codigo": "AMD.MSL.750",
+    "descripcion": "Ménsula de 0,75 metros"
+  },
+  {
+    "codigo": "AMD.PPS.0,25",
+    "descripcion": "Pin de seguridad"
+  },
+  {
+    "codigo": "AMD.PLT.320",
+    "descripcion": "Plataforma 0.320 X 0.320 mm"
+  },
+  {
+    "codigo": "AMD.PLT.750",
+    "descripcion": "Plataforma 0.320 X 0.750 mm."
+  },
+  {
+    "codigo": "AMD.PLT.1400",
+    "descripcion": "Plataforma 0.320 X 1.400 mm."
+  },
+  {
+    "codigo": "AMD.PLT.2072",
+    "descripcion": "Plataforma 0.320 X 2.072 mm."
+  },
+  {
+    "codigo": "AMD.PLT.3000",
+    "descripcion": "Plataforma 0.320 X 3.000 mm."
+  },
+  {
+    "codigo": "AMD.PLT ES.1400",
+    "descripcion": "Plataforma Escotilla, Fenolico de 0.610 X 1.400 mm."
+  },
+  {
+    "codigo": "AMD.PLT ES.2072",
+    "descripcion": "Plataforma Escotilla, Fenolico de 0.610 X 2.072 mm."
+  },
+  {
+    "codigo": "AMD.PLT ES.3000",
+    "descripcion": "Plataforma Escotilla, Fenolico de 0.610 X 3.000 mm."
+  },
+  {
+    "codigo": "AMD.PLT ESM.1400",
+    "descripcion": "Plataforma Escotilla, Metalica Al de 0.610 X 1.400 mm."
+  },
+  {
+    "codigo": "AMD.PLT ESM.2072",
+    "descripcion": "Plataforma Escotilla, Metalica Al de 0.610 X 2.072 mm."
+  },
+  {
+    "codigo": "AMD.PLT ESM.3000",
+    "descripcion": "Plataforma Escotilla, Metalica Al de 0.610 X 3.000 mm."
+  },
+  {
+    "codigo": "AMD.PLT ESS.1400",
+    "descripcion": "Plataforma Escotilla, Solo Estructura de 0.610 X 1.400 mm."
+  },
+  {
+    "codigo": "AMD.PLT ESS.3000",
+    "descripcion": "Plataforma Escotilla, Solo Estructura de 0.610 X 3.000 mm."
+  },
+  {
+    "codigo": "AMD.PLT MET.1400",
+    "descripcion": "Plataforma Metalica Fija Al de 0.610 X 1.400 mm."
+  },
+  {
+    "codigo": "AMD.RDP.750",
+    "descripcion": "Rodapié de 0.75 mm"
+  },
+  {
+    "codigo": "AMD.RDP.1400",
+    "descripcion": "Rodapié de 1.400 mm"
+  },
+  {
+    "codigo": "AMD.RDP.2072",
+    "descripcion": "Rodapié de 2.072 mm"
+  },
+  {
+    "codigo": "AMD.RDP.3000",
+    "descripcion": "Rodapié de 3.000 mm"
+  },
+  {
+    "codigo": "AMD.RDP MET.1400",
+    "descripcion": "Rodapié Metalico de 1.400 mm"
+  },
+  {
+    "codigo": "AMD.RDP MET.2072",
+    "descripcion": "Rodapié Metalico de 2.072 mm"
+  },
+  {
+    "codigo": "AMD.RDP MET.3000",
+    "descripcion": "Rodapié Metalico de 3.000 mm"
+  },
+  {
+    "codigo": "AMD.RDA.800",
+    "descripcion": "Rueda con tornillo nivelador ( 800 kg)"
+  },
+  {
+    "codigo": "AMD.RDA.ST.800",
+    "descripcion": "Rueda Corta Sin Tornillo Nivelador 8\""
+  },
+  {
+    "codigo": "AMD.TNPV.0,60",
+    "descripcion": "Tornillo Nivelador Base pivotante 38 m.m.."
+  },
+  {
+    "codigo": "AMD.TN.0,60",
+    "descripcion": "Tornillo Nivelador Base Plana 38 m.m.."
+  },
+  {
+    "codigo": "AMD.TNBU. 0,60",
+    "descripcion": "Tornillo Nivelador Base U 38 m.m.."
+  },
+  {
+    "codigo": "AMD.TUBO.LISO",
+    "descripcion": "Tubo Liso de 48.3 mm"
+  },
+  {
+    "codigo": "AMD.VT.CE.1000",
+    "descripcion": "Vertical de 1.000 mm CON Espigo"
+  },
+  {
+    "codigo": "AMD.VT.SE.1000",
+    "descripcion": "Vertical de 1.000 mm SIN Espigo"
+  },
+  {
+    "codigo": "AMD.VT.CE.1500",
+    "descripcion": "Vertical de 1.500 mm CON Espigo"
+  },
+  {
+    "codigo": "AMD.VT.SE.1500",
+    "descripcion": "Vertical de 1.500 mm SIN Espigo"
+  },
+  {
+    "codigo": "AMD.VT.CE.2000",
+    "descripcion": "Vertical de 2.000 mm CON Espigo"
+  },
+  {
+    "codigo": "AMD.VT.ME.2000",
+    "descripcion": "Vertical de 2.000 mm Mas Espigo"
+  },
+  {
+    "codigo": "AMD.VT.SE.2000",
+    "descripcion": "Vertical de 2.000 mm SIN Espigo"
+  },
+  {
+    "codigo": "AMD.VT.CE.3000",
+    "descripcion": "Vertical de 3.000 mm CON Espigo"
+  },
+  {
+    "codigo": "AMD.VT.SE.3000",
+    "descripcion": "Vertical de 3.000 mm SIN Espigo"
+  },
+  {
+    "codigo": "AMD.VT.SE.500",
+    "descripcion": "Vertical de 500 mm Sin Espigo"
+  },
+  {
+    "codigo": "AMD.VT.CE.500",
+    "descripcion": "Vertical de 500 mm Con Espigo"
+  },
+  {
+    "codigo": "AMD.VC.6000",
+    "descripcion": "VIGA CELOSIA 48.3 X 3.3 X 6000 MM"
+  },
+  {
+    "codigo": "AMD.VP.1400",
+    "descripcion": "Viga puente de 1.400 mm."
+  },
+  {
+    "codigo": "AMD.VP.2072",
+    "descripcion": "Viga puente de 2.072 mm."
+  },
+  {
+    "codigo": "AMD.VP.3000",
+    "descripcion": "Viga puente de 3.000 mm."
+  }
+]
